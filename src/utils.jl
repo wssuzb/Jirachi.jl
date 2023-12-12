@@ -257,8 +257,8 @@ function select_time(data1::lc, data2::lc, fi_np::String)
         idx = find_nearest(data2.time, data1.time[i])
         idx_list = push!(idx_list, idx)
         
-        time = push!(time, round(data1.time[i], digits=2)) # * 24 * 3600
-        time_ = push!(time_, round(data2.time[idx],digits=2)) # * 24 * 3600
+        time = push!(time, round(data1.time[i], digits=2))
+        time_ = push!(time_, round(data2.time[idx],digits=2))
         flux = push!(flux, data2.flux[idx])
         err = push!(err, data2.err[idx])
     end
