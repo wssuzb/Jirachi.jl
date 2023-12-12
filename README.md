@@ -7,9 +7,22 @@
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://wssuzb.github.io/Jirachi.jl/stable/)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://wssuzb.github.io/Jirachi.jl/dev/)
 <!-- [![Build Status](https://github.com/wssuzb/Jirachi.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/wssuzb/Jirachi.jl/actions/workflows/CI.yml?query=branch%3Amain) -->
-[![Coverage](https://codecov.io/gh/wssuzb/Jirachi.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/wssuzb/Jirachi.jl)
+<!-- [![Coverage](https://codecov.io/gh/wssuzb/Jirachi.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/wssuzb/Jirachi.jl) -->
 
+## Usage
 
+```julia
+using Pkg
+Pkg.add("https://github.com/wssuzb/Jirachi.jl.git")
+using Jirachi
+```
+
+or alternatively, you can also download this `Jirachi.jl-main.zip` file, and load it by
+```julia
+push!(LOAD_PATH, path + "Jirachi.jl-main")
+using Jirachi
+```
+you just need to modify the `path`, where the `Jirachi` is downloaded, and enjoy youself!
 
 ## About this project
 
