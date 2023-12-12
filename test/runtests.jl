@@ -128,7 +128,46 @@ function mysf(fig::Figure)
     return fig
 end
 
+function myhist!(fig::Figure)
+    # set_theme!(fonts = (; regular = "Times New Roman"))
+    set_theme!(fonts = (; regular = "/Users/suzhenbo/opt/anaconda3/lib/python3.8/site-packages/smplotlib/ttf/AVHersheyComplexMedium.ttf"))
 
+  
+    ax = Axis(fig[1, 2], aspect = 1, xscale=log10, yscale=log10, 
+
+    xminorticks = IntervalsBetween(10),
+    yminorticks = IntervalsBetween(10),
+    xticksmirrored = true, yticksmirrored = true, 
+    xminorticksvisible = true,
+    xminorgridvisible = false,      
+    yminorticksvisible = true,
+    yminorgridvisible = false,  
+    xminortickalign = 1,
+    yminortickalign = 1,
+    xtickalign = 1,
+    ytickalign = 1,
+    xgridvisible = false,
+    ygridvisible = false)
+
+    l1 = lines!(ax, t_fit_1, sf_fit_1, )
+    l2 = lines!(ax, t_fit_2, sf_fit_2)
+    s1 = scatter!(ax, 10 .^ binsf1.x, binsf1.y)
+    s2 = scatter!(ax, 10 .^ binsf2.x, binsf2.y)
+
+    e1 = errorbars!(ax, 10 .^ binsf1.x, binsf1.y, binsf1.yerr, binsf1.yerr, whiskerwidth = 0.2)
+    e2 = errorbars!(ax, 10 .^ binsf2.x, binsf2.y, binsf2.yerr, binsf2.yerr, whiskerwidth = 0.2; transparency=true)
+    # vspan!([10 ^ t_min_1], [10 ^ t_break_1], color = (:blue))
+
+    band!(ax, 10 ^ t_min_1:10^t_break_1, 0.006, 0.1, color= (:red, 0.1) )
+    # hspan!(-1.1, -0.9, color = (:blue, 0.5))
+
+    xlims!(80, 3e4)
+    ylims!(0.006, 0.1)
+
+    # resize_to_layout!(fig)
+    # fig[1, 1] = ax
+    return fig
+end
 function mycv_flux!(f::Figure)
 
     ax2 = Axis(f[2, 1], aspect = 1, xscale=log10, 
@@ -192,6 +231,7 @@ function mycv_mag!(f::Figure)
 end
 
 fig = mysf(Figure(size=(500, 500)))
+myhist!(fig)
 mycv_flux!(fig)
 mycv_mag!(fig)
 resize_to_layout!(fig)
