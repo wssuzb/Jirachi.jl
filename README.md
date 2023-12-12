@@ -9,6 +9,17 @@
 <!-- [![Build Status](https://github.com/wssuzb/Jirachi.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/wssuzb/Jirachi.jl/actions/workflows/CI.yml?query=branch%3Amain) -->
 <!-- [![Coverage](https://codecov.io/gh/wssuzb/Jirachi.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/wssuzb/Jirachi.jl) -->
 
+## About this project
+
+Several function can be found in this project to help us get better understand the central engine of AGNs:
+
+- [x] color variation
+- [x] structure function
+- [x] generate DRW
+
+This project also provide a `PYTHON` version for calculating color variation, and can be found at `py/pyColorVariation.py`.
+
+
 ## Usage
 
 ```julia
@@ -24,15 +35,7 @@ using Jirachi
 ```
 you just need to modify the `path`, where the `Jirachi` is downloaded, and enjoy youself!
 
-## About this project
 
-Several function can be found in this project to help us get better understand the central engine of AGNs:
-
-- [x] color variation
-- [x] structure function
-- [x] generate DRW
-
-This project also provide a `PYTHON` version for calculating color variation, and can be found at `py/pyColorVariation.py`.
 
 ## Citing
 
