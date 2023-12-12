@@ -1,0 +1,13 @@
+name = "Jirachi"
+uuid = "36e9cde8-e561-470d-9fdf-67395760a447"
+authors = ["zhenbo su"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
