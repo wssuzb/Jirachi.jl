@@ -1,5 +1,6 @@
-# Jirachi.jl 
+# Jirachi.jl - Julia project for analyzing color variation in active galaxies harboring massive black holes
 
+<img align="right" alt="jirachi" src="./test/fig/jirachi.jpeg" width="200" height="200"/>
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://wssuzb.github.io/Jirachi.jl/stable/)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://wssuzb.github.io/Jirachi.jl/dev/)
