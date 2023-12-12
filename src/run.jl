@@ -99,4 +99,9 @@ function runall(lc1::lc, lc2::lc; sf_bin_edges=1:0.1:5, cv_bin_edges=1:0.2:5, ns
         file["num_pos"] = num_pos
     end
 
+    result = (
+        sf = sf, cv = cv, fit = fit, par = par, sf_min = [sf_min_1, sf_min_2], t_min = [t_min_1, t_min_2], t_max =  [t_break_1, t_break_2], num_all = num_all, num_cut = num_cut, num_pos = num_pos
+    )
+    
+    return result
 end

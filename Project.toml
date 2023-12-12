@@ -4,12 +4,14 @@ authors = ["zhenbo su"]
 version = "1.0.0-DEV"
 
 [deps]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 HDF5 = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
 Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 LsqFit = "2fda8390-95c7-5789-9bda-21331edee243"
+MakiePublication = "dde8697e-0d61-460d-88dd-856f66710dd1"
 Peaks = "18e31ff7-3703-566c-8e60-38913d67486b"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"

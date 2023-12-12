@@ -29,7 +29,7 @@ function find_t_min(data::binned_result, p::Vector{Float64}; noise_sigma=2, t_fi
     return (t_min = t_used_min, sf_min = noise_cut, t_fit = t_fit, sf_fit = sf_fit)
 end
 
-function find_t_break(data::binned_result; check_plot::Bool=false)
+function find_t_break(data::binned_result) #; check_plot::Bool=false
 
     idx = all.(isfinite, data.y)
 
@@ -44,11 +44,11 @@ function find_t_break(data::binned_result; check_plot::Bool=false)
     
     idx_max_ = findmax(widths)[2]
 
-    if check_plot
-        println(" plotting")
-        plt = plotpeaks(t_new, sf_new, peaks=[pks[idx_max_]], prominences=true, widths=true)
-        display(plt)
-    end
+    # if check_plot
+    #     println(" plotting")
+    #     plt = plotpeaks(t_new, sf_new, peaks=[pks[idx_max_]], prominences=true, widths=true)
+    #     display(plt)
+    # end
 
     return t_new[pks[idx_max_]]
 end
