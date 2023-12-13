@@ -39,6 +39,8 @@ you just need to modify the `path`, where the `Jirachi` is downloaded, and enjoy
 ##
 
 - structure function
+- 
+
 ![sf](test/fig/plot_sf.svg)
 
 ## Citing
