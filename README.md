@@ -39,9 +39,10 @@ you just need to modify the `path`, where the `Jirachi` is downloaded, and enjoy
 ##
 
 - structure function
-- 
 
-![sf](test/fig/plot_sf.svg)
+
+<img align="center" alt="sf" src="./test/fig/plot_sf.svg" width="200" height="200"/>
+
 
 ## Citing
 
