@@ -13,25 +13,26 @@
 
 Several function can be found in this project to help us get better understand the central engine of AGNs:
 
-- [x] color variation
-- [x] structure function
-- [x] generate DRW
+- color variation
+- structure function
+- generate DRW
 
 This project also provide a `PYTHON` version for calculating color variation, and can be found at `py/pyColorVariation.py`.
 
 
-## Usage
+## Install
 
 ```julia
-using Pkg
-Pkg.add("https://github.com/wssuzb/Jirachi.jl.git")
-using Jirachi
+julia> # Press the key "]"
+
+(@v1.9) pkg> add https://github.com/wssuzb/Jirachi.jl.git
+julia> using Jirachi
 ```
 
 or alternatively, you can also download this `Jirachi.jl-main.zip` file, and load it by
 ```julia
-push!(LOAD_PATH, path + "Jirachi.jl-main")
-using Jirachi
+julia> push!(LOAD_PATH, path + "Jirachi.jl-main")
+julia> using Jirachi
 ```
 you just need to modify the `path`, where the `Jirachi` is downloaded, and enjoy youself!
 
