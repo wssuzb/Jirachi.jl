@@ -10,8 +10,10 @@ include("../src/structure_function.jl")
 include("../src/color_variation.jl")
 include("../src/fractional_variability.jl")
 include("../src/run.jl")
+
+using UncertainData, Random, Peaks, LaTeXStrings, DelimitedFiles, LsqFit, Interpolations, StatsBase, HDF5, Printf, LinearAlgebra, CairoMakie, MakiePublication
+
 include("../src/fitting.jl")
-using UncertainData, Random, Peaks, LaTeXStrings, DelimitedFiles, LsqFit, Interpolations, StatsBase, HDF5, Printf, LinearAlgebra, CairoMakie
 
 band = ["g", "r", "i", "z"]
 
@@ -85,48 +87,90 @@ cv_mag = cv_mag_res
 
 bincv_mag = binned_color_variation(cv_mag, cv_bin_edges)
   
+# function log_tick_formatter(values)
+#     return map(v -> Makie.UnicodeFun.to_superscript(round(Int64, v)), values)
+# end
 
-fig = Figure()
-function mysf(fig::Figure)
+function mysf()
     # set_theme!(fonts = (; regular = "Times New Roman"))
-    set_theme!(fonts = (; regular = "/Users/suzhenbo/opt/anaconda3/lib/python3.8/site-packages/smplotlib/ttf/AVHersheyComplexMedium.ttf"))
+    # set_theme!(fonts = (; regular = "/Users/suzhenbo/opt/anaconda3/lib/python3.8/site-packages/smplotlib/ttf/AVHersheyComplexMedium.ttf"))
 
-  
-    ax = Axis(fig[1, 1], aspect = 1, xscale=log10, yscale=log10, 
+    fig = Figure()  
 
-    xminorticks = IntervalsBetween(10),
-    yminorticks = IntervalsBetween(10),
+    ax = Axis(fig[1, 1],
+    xlabel=L"$\Delta t$ [sec]",
+    ylabel="SF [mag]",
+    # xtickformat = ,
+    xscale=log10, 
+    yscale=log10, 
+    xticksize=8,
+    yticksize=8,
+    # xtickformat=log_tick_formatter,
+    # ytickformat=log_tick_formatter,
+    # xminorticks = IntervalsBetween(10),
+    # yminorticks = IntervalsBetween(10),
     xticksmirrored = true, yticksmirrored = true, 
-    xminorticksvisible = true,
-    xminorgridvisible = false,      
-    yminorticksvisible = true,
-    yminorgridvisible = false,  
-    xminortickalign = 1,
-    yminortickalign = 1,
-    xtickalign = 1,
-    ytickalign = 1,
-    xgridvisible = false,
-    ygridvisible = false)
+    # xminorticksvisible = true,
+    # xminorgridvisible = false,      
+    # yminorticksvisible = true,
+    # yminorgridvisible = false,  
+    # xminortickalign = 1,
+    # yminortickalign = 1,
+    # xtickalign = 1,
+    # ytickalign = 1,
+    # xgridvisible = false,
+    # ygridvisible = false
+    )
 
     l1 = lines!(ax, t_fit_1, sf_fit_1, )
     l2 = lines!(ax, t_fit_2, sf_fit_2)
     s1 = scatter!(ax, 10 .^ binsf1.x, binsf1.y)
     s2 = scatter!(ax, 10 .^ binsf2.x, binsf2.y)
 
-    e1 = errorbars!(ax, 10 .^ binsf1.x, binsf1.y, binsf1.yerr, binsf1.yerr, whiskerwidth = 0.2)
-    e2 = errorbars!(ax, 10 .^ binsf2.x, binsf2.y, binsf2.yerr, binsf2.yerr, whiskerwidth = 0.2; transparency=true)
+    e1 = errorbars!(ax, 10 .^ binsf1.x, binsf1.y, binsf1.yerr, binsf1.yerr, linewidth=0.5, whiskerwidth = 0.2)
+    e2 = errorbars!(ax, 10 .^ binsf2.x, binsf2.y, binsf2.yerr, binsf2.yerr,  linewidth=0.5,  whiskerwidth = 0.2; transparency=true)
     # vspan!([10 ^ t_min_1], [10 ^ t_break_1], color = (:blue))
 
-    band!(ax, 10 ^ t_min_1:10^t_break_1, 0.006, 0.1, color= (:red, 0.1) )
+    band!(ax, 10 ^ t_min_1:10^t_break_1, 0.003, 0.1, color= (:red, 0.1) )
     # hspan!(-1.1, -0.9, color = (:blue, 0.5))
 
     xlims!(80, 3e4)
-    ylims!(0.006, 0.1)
+    # ylims!(4e-3, 2e-1)
+    ylims!(5e-3, 0.1)
+    
 
-    # resize_to_layout!(fig)
+    resize_to_layout!(fig)
     # fig[1, 1] = ax
     return fig
 end
+
+llc = Cycle([:color, :linestyle], covary=true)
+ssc = Cycle([:color=>:markercolor, :strokecolor=>:color, :marker], covary=true)
+
+
+tex_web = merge(theme_web(width=350,
+colors=MakiePublication.tableau_10(),
+linestyles=[nothing, :dash, :dash],
+ishollowmarkers=[true, true, false],
+markers=[:circle, :diamond, :rtriangle],
+linecycle=llc,
+scattercycle=ssc,
+markerstrokewidth=0.8, heightwidthratio=0.9,), theme_latexfonts())
+
+fig_sf = with_theme(tex_web) do 
+    mysf()
+end
+save("./test/fig/plot_sf.svg", fig_sf, px_per_unit=4)
+# with_theme(mysf, theme_web( width=300,
+# colors=MakiePublication.tableau_10(),
+# linestyles=[nothing, :dash, :dash],
+# ishollowmarkers=[true, true, false],
+# markers=[:circle, :diamond, :rtriangle],
+# linecycle=llc,
+# scattercycle=ssc,
+# markerstrokewidth=0.8, heightwidthratio=0.8   # font="Times New Roman"
+#     )
+# )
 
 function myhist!(fig::Figure)
     # set_theme!(fonts = (; regular = "Times New Roman"))
@@ -165,9 +209,11 @@ function myhist!(fig::Figure)
     ylims!(0.006, 0.1)
 
     # resize_to_layout!(fig)
-    # fig[1, 1] = ax
+    fig[1, 1] = ax
     return fig
 end
+
+
 function mycv_flux!(f::Figure)
 
     ax2 = Axis(f[2, 1], aspect = 1, xscale=log10, 
@@ -199,12 +245,13 @@ function mycv_flux!(f::Figure)
     return f
 end
 
+
 function mycv_mag!(f::Figure)
 
     ax3 = Axis(f[2, 2], aspect = 1, xscale=log10, 
     
     xminorticks = IntervalsBetween(10),
-    yminorticks = IntervalsBetween(10),
+    # yminorticks = IntervalsBetween(10),
     xticksmirrored = true, yticksmirrored = true, 
     xminorticksvisible = true,
     xminorgridvisible = false,      
@@ -235,3 +282,27 @@ myhist!(fig)
 mycv_flux!(fig)
 mycv_mag!(fig)
 resize_to_layout!(fig)
+
+
+function myplot()
+    fig = Figure(figure_padding=(2, 6, 1, 6))
+    ax = Axis(fig, xlabel=L"x", ylabel=L"f(x)")
+    x = [1, 2, 3, 4, 5]
+
+    y_A = [1, 2, 1, 2, 1]
+    err_A = [0.1, 0.2, 0.1, 0.2, 0.3]
+    
+    y_B = [2, 3, 2, 3, 2]
+    err_B = [0.2, 0.3, 0.2, 0.1, 0.1]
+    
+    scatter!(ax, x, y_A, label='A')
+    errorbars!(ax, x, y_A, err_A, label='A', linewidth=0.3)
+    
+    scatter!(ax, x, y_B, label='B')
+    errorbars!(ax, x, y_B, err_B, label='B', linewidth=0.3)
+    fig[1,1] = ax
+    fig
+end
+
+
+
