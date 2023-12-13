@@ -322,7 +322,7 @@ linecycle=llc,
 scattercycle=ssc,
 markerstrokewidth=0.8, heightwidthratio=0.9,), theme_latexfonts())
 
-function mysf()
+function mysf(sf1::binned_result, sf2::binned_result; )
 
     with_theme(tex_web) do 
         fig = Figure()  
@@ -339,13 +339,13 @@ function mysf()
 
         l1 = lines!(ax, t_fit_1, sf_fit_1)
         l2 = lines!(ax, t_fit_2, sf_fit_2)
-        s1 = scatter!(ax, 10 .^ binsf1.x, binsf1.y)
-        s2 = scatter!(ax, 10 .^ binsf2.x, binsf2.y)
+        s1 = scatter!(ax, 10 .^ sf1.x, sf1.y)
+        s2 = scatter!(ax, 10 .^ sf2.x, sf2.y)
 
-        e1 = errorbars!(ax, 10 .^ binsf1.x, binsf1.y, binsf1.yerr, binsf1.yerr, linewidth=0.3, whiskerwidth = 0.2)
-        e2 = errorbars!(ax, 10 .^ binsf2.x, binsf2.y, binsf2.yerr, binsf2.yerr,  linewidth=0.3,  whiskerwidth = 0.2; transparency=true)
+        e1 = errorbars!(ax, 10 .^ sf1.x, sf1.y, sf1.yerr, sf1.yerr, linewidth=0.3, whiskerwidth = 0.2)
+        e2 = errorbars!(ax, 10 .^ sf2.x, sf2.y, sf2.yerr, sf2.yerr,  linewidth=0.3,  whiskerwidth = 0.2; transparency=true)
         # vspan!([10 ^ t_min_1], [10 ^ t_break_1], color = (:blue))
-        
+
         band!(ax, 10 ^ t_min_1:10^t_break_1, 0.003, 0.1, color= (:red, 0.1) )
         # hspan!(-1.1, -0.9, color = (:blue, 0.5))
 
