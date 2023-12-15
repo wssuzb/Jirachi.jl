@@ -18,21 +18,21 @@ include("../src/fitting.jl")
 band = ["g", "r", "i", "z"]
 
 for b in band
-    lc1 = load_data("test/data/montano22_n1_g.txt")
+    lc1 = load_data("./test/data/montano22_n1_g.txt")
     lc1.time = lc1.time * 3600 * 24
-    lc2 = load_data("test/data/montano22_n1_" * b * ".txt")
+    lc2 = load_data("./test/data/montano22_n1_" * b * ".txt")
     lc2.time = lc2.time * 3600 * 24
-    select_time(lc1, lc2, "test/data/montano22_n1_" * b * "_binned.txt")
+    select_time(lc1, lc2, "./test/data/montano22_n1_" * b * "_binned.txt")
 end
 
-lc1 = load_data("/Users/suzhenbo/Mylibrary/Projects/lib_julia_external/VariabilityTools/test_data/lc/montano22_n1_i_binned.txt", [1, 3, 4]; band = "i")
-lc2 = load_data("/Users/suzhenbo/Mylibrary/Projects/lib_julia_external/VariabilityTools/test_data/lc/montano22_n1_z_binned.txt", [1, 3, 4]; band = "z")
+# lc1 = load_data("/Users/suzhenbo/Mylibrary/Projects/lib_julia_external/VariabilityTools/test_data/lc/montano22_n1_i_binned.txt", [1, 3, 4]; band = "i")
+# lc2 = load_data("/Users/suzhenbo/Mylibrary/Projects/lib_julia_external/VariabilityTools/test_data/lc/montano22_n1_z_binned.txt", [1, 3, 4]; band = "z")
 
 
-lc1 = load_data("test/data/montano22_n1_i_binned.txt", [1, 3, 4]; band = "i")
+lc1 = load_data("./test/data/montano22_n1_i_binned.txt", [1, 3, 4]; band = "i")
 # lc1.time =  lc1.time* 3600 * 24
 
-lc2 = load_data("test/data/montano22_n1_z_binned.txt", [1, 3, 4]; band = "z")
+lc2 = load_data("./test/data/montano22_n1_z_binned.txt", [1, 3, 4]; band = "z")
 # lc2.time =  lc2.time * 3600 * 24
 
 # lc1 == lc1_
@@ -176,7 +176,7 @@ save("./test/fig/plot_sf.svg", fig_sf, px_per_unit=4)
 
 function myhist!(fig::Figure)
     # set_theme!(fonts = (; regular = "Times New Roman"))
-    set_theme!(fonts = (; regular = "/Users/suzhenbo/opt/anaconda3/lib/python3.8/site-packages/smplotlib/ttf/AVHersheyComplexMedium.ttf"))
+    # set_theme!(fonts = (; regular = "/Users/suzhenbo/opt/anaconda3/lib/python3.8/site-packages/smplotlib/ttf/AVHersheyComplexMedium.ttf"))
 
   
     ax = Axis(fig[1, 2], aspect = 1, xscale=log10, yscale=log10, 
@@ -415,10 +415,10 @@ err_bin = bin(lc_bin_err, lc_edges, lc.time, lc.err)
 
 # function check_quasi_time()
 
-lc1 = load_data("/Users/suzhenbo/Mylibrary/Projects/archive_data/ngc4395/McHardy22/LightCurve_NotNormalised_mjy_g_8000.dat", [1, 2, 3]; band = "g")
-# lc1.time = round.(lc1.time * 24 * 3600, digits=2)
-lc2 = load_data("/Users/suzhenbo/Mylibrary/Projects/archive_data/ngc4395/McHardy22/LightCurve_NotNormalised_mjy_z_8000.dat", [1, 2, 3]; band = "r")
-# lc2.time = round.(lc2.time * 24 * 3600, digits=2)
+# lc1 = load_data("/Users/suzhenbo/Mylibrary/Projects/archive_data/ngc4395/McHardy22/LightCurve_NotNormalised_mjy_g_8000.dat", [1, 2, 3]; band = "g")
+# # lc1.time = round.(lc1.time * 24 * 3600, digits=2)
+# lc2 = load_data("/Users/suzhenbo/Mylibrary/Projects/archive_data/ngc4395/McHardy22/LightCurve_NotNormalised_mjy_z_8000.dat", [1, 2, 3]; band = "r")
+# # lc2.time = round.(lc2.time * 24 * 3600, digits=2)
 
 
 # t_cad = mean(diff(lc1.time))
