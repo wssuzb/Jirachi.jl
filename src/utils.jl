@@ -243,11 +243,8 @@ end
 
 
 
-function find_nearest(arr, val)
-    idx = argmin(abs.(arr .- val))
-    return idx
-end
-
+find_nearest(arr, val) = argmin(abs.(arr .- val))
+    
 function select_time(data1::lightcurve, data2::lightcurve, fi_np::String)
 
     time, time_, flux, err = [], [], [], []
@@ -295,9 +292,10 @@ function bin_light_curve(lc::lightcurve; lc_edges::AbstractArray)
     err_bin = bin(lc_bin_err, lc_edges, lc.time, lc.err)
     return lightcurve(bin_center, flux_bin, err_bin, lc.band)
 end
+# bin_light_curve(lc, lc_edges) = bin_light_curve(lc::lightcurve; lc_edges::AbstractArray)
 
 function get_common_lc(lc1::lightcurve, lc2::lightcurve)
-    
+    # find the index of values that are finite.
     idx = all(!isnan, hcat(lc1.flux, lc2.flux); dims=2) |> vec
     
     lc1.time, lc1.flux, lc1.err = lc1.time[idx], lc1.flux[idx], lc1.err[idx]

@@ -32,6 +32,8 @@ def color_variation(t, r1, r2, e1, e2, mode='flux', erron=True, nsigma=3):
 
         mmd = np.sqrt(dx_wmin_all ** 2 + dx_wmax_all ** 2)
 
+        # calculate error ellipse
+        
         err_mmd1 = ex_wmin_1e * ex_wmax_1e * np.sqrt((1 + dx_ratio2) / (ex_wmax_1e ** 2 + ex_wmin_1e ** 2 * dx_ratio2))
         err_mmd2 = ex_wmin_2e * ex_wmax_2e * np.sqrt((1 + dx_ratio2) / (ex_wmax_2e ** 2 + ex_wmin_2e ** 2 * dx_ratio2)) 
 

@@ -5,7 +5,7 @@ isEqual(lc1::lightcurve, lc2::lightcurve) = diff(lc1.time) == diff(lc2.time) ? p
 
 function flux2mag(flux, err)
     mag = -2.5 * log10.(flux)
-    mag_err = @. 2.5 / log(10) * (err / flux)
+    mag_err = @. 2.5 / log(10) * (err / flux) # approximately!!!
     return mag, mag_err
 end
 
@@ -65,6 +65,7 @@ function color_variation(lc1::lightcurve, lc2::lightcurve, nsigma=3, erron=true,
         dx_ratio2 = @. (dx_wmax_all / dx_wmin_all) ^ 2
         mmd = @. sqrt(dx_wmin_all ^ 2 + dx_wmax_all ^ 2)
         
+        # calculate error ellipse
         # σ1	
         err_mmd1 = @. ex_wmin_1e * ex_wmax_1e * sqrt((1+dx_ratio2) / (ex_wmax_1e ^ 2 + ex_wmin_1e ^ 2 * dx_ratio2))
         # σ2
