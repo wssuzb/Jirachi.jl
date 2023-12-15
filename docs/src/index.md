@@ -6,8 +6,7 @@ CurrentModule = Jirachi
 
 Documentation for [Jirachi](https://github.com/wssuzb/Jirachi.jl).
 
-```@index
-```
+## some functions 
 
 ```@autodocs
 Modules = [Jirachi]

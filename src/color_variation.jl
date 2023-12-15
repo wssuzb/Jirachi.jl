@@ -10,15 +10,15 @@ function flux2mag(flux, err)
 end
 
 """
-calculate color variation
-
-reference: Su et al., (2023)
-
-# Examples
-```jldoctest
-julia> color_variation(lc1, lc2, nsigma, erron, mode)
-```
+    color_variation(lc1::lightcurve, lc2::lightcurve, nsigma=3, erron=true, mode="mag";debug=false)
+calculate color variation, reference: Su et al., (2023)
 """
+
+# # Examples
+# ```jldoctest
+# julia> color_variation(lc1, lc2, nsigma, erron, mode)
+# ```
+
 function color_variation(lc1::lightcurve, lc2::lightcurve, nsigma=3, erron=true, mode="mag";debug=false)
 
     isEqual(lc1, lc2)

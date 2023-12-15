@@ -1,33 +1,27 @@
 export par, lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time, bin_light_curve, get_common_lc
-"""
-par(med, low, hig)
-
-structure for loading statistical results.
-
-# Examples
-```jldoctest
-julia> par(med, low, hig)
-julia> par.med, par.low, par.hig
-```
-"""
+# """
+#     par(med, low, hig)
+# structure for loading statistical results.
+# """
+# # Examples
+# ```jldoctest
+# julia> par(med, low, hig)
+# ```
 struct par
     med::Float64
     low::Float64
     hig::Float64
 end
 
+
+# # Examples
+# ```jldoctest
+# julia> lightcurve(time, flux, err)
+# ```
 """
-lightcurve(time, flux, err)
+    lightcurve(time, flux, err)
 
 structure for loading light curve.
-
-# Examples
-```jldoctest
-julia> res = lightcurve(time, flux, err)
-julia> res.time
-julia> res.flux
-julia> res.err
-```
 """
 @kwdef mutable struct lightcurve
     time::Vector{Float64}
@@ -38,34 +32,31 @@ end
 lightcurve(time, flux, err) = lightcurve(time, flux, err, [])
 
 
+
+# # Examples
+# ```jldoctest
+# julia> cv(tau, color)
+# ```
 """
-cv(tau, color)
+    cv(tau, color)
 
-structure for loading color variation results.
+structure for loading color variation temp results.
 
-# Examples
-```jldoctest
-julia> res = cv(tau, color)
-julia> res.tau
-julia> res.color
-```
 """
 struct cv
     tau::Vector{Float64}
     color::Vector{Float64}
 end
 
+# # Examples
+# ```jldoctest
+# julia> sf(tau, sf)
+# ```
 """
-sf(tau, sf)
+    sf(tau, sf)
 
 structure for loading structure function results.
 
-# Examples
-```jldoctest
-julia> res = sf(tau, sf)
-julia> res.tau
-julia> res.sf
-```
 """
 struct sf
     tau::Vector{Float64}
@@ -101,16 +92,14 @@ binned_result(x, xerr, y, yerr) = binned_result(x, xerr, y, yerr, [])
 #     return test
 # end
 
+# Examples
+# ```jldoctest
+# julia> percentile_16_50_84([1, 2, 3])
+# ```
 """
-percentile_16_50_84(array)
+    percentile_16_50_84(array)
 
 return 16%, 50% and 84% values with given array.
-
-# Examples
-```jldoctest
-julia> x = [1, 2, 3]
-julia> percentile_16_50_84(x)
-```
 """
 function percentile_16_50_84(x::T) where {T}
     med = percentile(x, 50)
@@ -132,22 +121,21 @@ function uniquecount(data)
 
 
 
- """
- lc_bootstrapped(data)
+#  # Examples
+#  ```jldoctest
+#  julia> lc_bootstrapped(data)
+#  ```
+
+"""
+    lc_bootstrapped(data::lightcurve; seed=1, mode="both")
  
+ 
+ return bootstrapped light curves, input data must be with format of ::lc.
  mode: 
     - 1, rss only
     - 2, fr only
     - 0, fr/rss
-
- return bootstrapped light curves, input data must be with format of ::lc.
- 
- # Examples
- ```jldoctest
- julia> _lc = lc_bootstrapped(data)
- ```
- """ 
-
+"""
 function lc_bootstrapped(data::lightcurve; seed=1, mode="both")
 
     Random.seed!(seed)
@@ -182,9 +170,9 @@ function lc_bootstrapped(data::lightcurve; seed=1, mode="both")
 
 end
 
-"""
-    idx = findmat(x->x > 0, dt_all)
-"""
+# """
+#     idx = findmat(x->x > 0, dt_all)
+# """
 
 function findmat(f, A::AbstractMatrix)
     m,n = size(A)
@@ -197,13 +185,9 @@ end
 
 
 """
-Loading light curves from txt files.
+    load_data(fi_np::String, usecols=[1, 2, 3]; band=[])
 
-# Examples
-```jldoctest
-julia> load_data(fi_np, usecols)
-julia> percentile_16_50_84(x)
-```
+Loading light curves from txt files.
 """
 function load_data(fi_np::String, usecols=[1, 2, 3]; band=[])
     tmp = readdlm(fi_np)
