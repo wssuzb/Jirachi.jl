@@ -129,7 +129,7 @@ function fitsf_mcmc(data::lightcurve; nsim=1000, lb = [0, 0, 0, 0.001], ub = [10
     idx_tmax = t_new .<= t_br
 
     # cheak initial guess of p0 values is under t_max
-    check_bounds(log10(p0[2]), t_br)
+    # check_bounds(log10(p0[2]), t_br)
 
     p0_bounds = ifelse(isempty(p0), (lb .+ ub) / 2, p0)
     # p0_bounds = (lb .+ ub) / 3 # we have to start inside the bounds

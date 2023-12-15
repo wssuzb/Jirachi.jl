@@ -1,4 +1,4 @@
-export par, lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time
+export par, lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time, bin_light_curve, get_common_lc
 """
 par(med, low, hig)
 
@@ -282,6 +282,38 @@ function select_time(data1::lightcurve, data2::lightcurve, fi_np::String)
     return time, time_, flux, err
 end
 
-function bin_light_curve()
 
+
+lc_bin_err(dataset::Vector{T}) where T =  sqrt.(sum(dataset .^ 2)) / length(dataset)
+
+function bin_light_curve(lc::lightcurve; lc_edges::AbstractArray)
+    _bin_edges = collect(lc_edges)
+    _bin_width = round.([(_bin_edges[i+1] - _bin_edges[i]) / 2 for i=1: lastindex(_bin_edges)-1], digits=2)
+    bin_center = round.(_bin_edges[2:end] .- _bin_width, digits=2)
+
+    flux_bin = bin(mean, lc_edges, lc.time, lc.flux)
+    err_bin = bin(lc_bin_err, lc_edges, lc.time, lc.err)
+    return lightcurve(bin_center, flux_bin, err_bin, lc.band)
 end
+
+function get_common_lc(lc1::lightcurve, lc2::lightcurve)
+    
+    idx = all(!isnan, hcat(lc1.flux, lc2.flux); dims=2) |> vec
+    
+    lc1.time, lc1.flux, lc1.err = lc1.time[idx], lc1.flux[idx], lc1.err[idx]
+    lc2.time, lc2.flux, lc2.err = lc2.time[idx], lc2.flux[idx], lc2.err[idx]
+    
+    # lc1.time[t1_idx] ∩ lc2.time[t2_idx]
+    # filter(row -> all(x -> !(x isa Number && isnan(x)), row), t_bin)
+    return lc1, lc2
+end
+
+# function get_common_lc(arr1::T, arr2::T) where{T}
+#     # find the common values of two given array: arr1, arr2
+#     common_t = intersect(arr1, arr2)
+   
+#     # find the index of the common values in: arr1, arr2, respectively.
+#     ind1 = indexin(common_t, arr1)
+#     ind2 = indexin(common_t, arr2)
+#     return ind1, ind2
+# end
