@@ -74,7 +74,7 @@ end
 
 check_bounds(p0_tau, t_max) = p0_tau < t_max ? println(" ") : error("The initial guess of tau parameters values in p0 should smaller than t max!!!")
 
-function fitsf_mcmc(data::lc; nsim=1000, lb = [0, 0, 0, 0.001], ub = [10, 2e4, 2, 0.1], sf_bin_edges=1:0.1:5, p0 = [], mode = "both")
+function fitsf_mcmc(data::lightcurve; nsim=1000, lb = [0, 0, 0, 0.001], ub = [10, 2e4, 2, 0.1], sf_bin_edges=1:0.1:5, p0 = [], mode = "both")
 
 
 

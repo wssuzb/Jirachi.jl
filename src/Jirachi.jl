@@ -34,7 +34,7 @@ include("run.jl")
 # end
 
 
-export par, lc, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time
+export par, lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time
 
 export color_variation, binned_color_variation, structure_function, binned_structure_function, err_bootstraped, flux2mag
 

@@ -1,7 +1,7 @@
 export color_variation, binned_color_variation, flux2mag
 
 
-isEqual(lc1::lc, lc2::lc) = diff(lc1.time) == diff(lc2.time) ? println(" ") : error("The Light curves should be quasi-simultaneou observed!!!")
+isEqual(lc1::lightcurve, lc2::lightcurve) = diff(lc1.time) == diff(lc2.time) ? println(" ") : error("The Light curves should be quasi-simultaneou observed!!!")
 
 function flux2mag(flux, err)
     mag = -2.5 * log10.(flux)
@@ -19,7 +19,7 @@ reference: Su et al., (2023)
 julia> color_variation(lc1, lc2, nsigma, erron, mode)
 ```
 """
-function color_variation(lc1::lc, lc2::lc, nsigma=3, erron=true, mode="mag";debug=false)
+function color_variation(lc1::lightcurve, lc2::lightcurve, nsigma=3, erron=true, mode="mag";debug=false)
 
     isEqual(lc1, lc2)
     

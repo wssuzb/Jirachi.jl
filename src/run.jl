@@ -1,6 +1,6 @@
 export  runall
 
-function runall(lc1::lc, lc2::lc; sf_bin_edges=1:0.1:5, cv_bin_edges=1:0.2:5, nsigma=3, erron=true, nsim=10, fi_np::String="./run_all.h5", lower_bounds = [0, 0, 0, 0.001], upper_bounds = [10, 2e4, 2, 0.1], p0=[], mode="both")
+function runall(lc1::lightcurve, lc2::lightcurve; sf_bin_edges=1:0.1:5, cv_bin_edges=1:0.2:5, nsigma=3, erron=true, nsim=10, fi_np::String="./run_all.h5", lower_bounds = [0, 0, 0, 0.001], upper_bounds = [10, 2e4, 2, 0.1], p0=[], mode="both")
 
     # sf1 = structure_function(lc1.time, lc1.flux)
     # sf2 = structure_function(lc2.time, lc2.flux)

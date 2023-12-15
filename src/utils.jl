@@ -1,4 +1,4 @@
-export par, lc, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time
+export par, lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time
 """
 par(med, low, hig)
 
@@ -17,25 +17,25 @@ struct par
 end
 
 """
-lc(time, flux, err)
+lightcurve(time, flux, err)
 
 structure for loading light curve.
 
 # Examples
 ```jldoctest
-julia> res = lc(time, flux, err)
+julia> res = lightcurve(time, flux, err)
 julia> res.time
 julia> res.flux
 julia> res.err
 ```
 """
-@kwdef mutable struct lc
+@kwdef mutable struct lightcurve
     time::Vector{Float64}
     flux::Vector{Float64}
     err::Vector{Float64}
     band
 end
-lc(time, flux, err) = lc(time, flux, err, [])
+lightcurve(time, flux, err) = lightcurve(time, flux, err, [])
 
 
 """
@@ -148,7 +148,7 @@ function uniquecount(data)
  ```
  """ 
 
-function lc_bootstrapped(data::lc; seed=1, mode="both")
+function lc_bootstrapped(data::lightcurve; seed=1, mode="both")
 
     Random.seed!(seed)
 
@@ -165,14 +165,14 @@ function lc_bootstrapped(data::lc; seed=1, mode="both")
 
     if mode == "rss"
     
-        return lc(t_rss[idx_sort], y_rss[idx_sort], e_rss[idx_sort], data.band)
+        return lightcurve(t_rss[idx_sort], y_rss[idx_sort], e_rss[idx_sort], data.band)
     
     elseif mode == "both"
     
-        return lc(t_rss[idx_sort], y_fr_rss[idx_sort], e_rss[idx_sort], data.band)
+        return lightcurve(t_rss[idx_sort], y_fr_rss[idx_sort], e_rss[idx_sort], data.band)
     
     else
-        return lc(
+        return lightcurve(
             data.time,
             [rand(Normal(data.flux[i], data.err[i]), 1)[1] for i=1: lastindex(data.flux)],
             data.err,
@@ -207,7 +207,7 @@ julia> percentile_16_50_84(x)
 """
 function load_data(fi_np::String, usecols=[1, 2, 3]; band=[])
     tmp = readdlm(fi_np)
-    data = lc(tmp[:, usecols[1]], tmp[:, usecols[2]], tmp[:, usecols[3]], band)
+    data = lightcurve(tmp[:, usecols[1]], tmp[:, usecols[2]], tmp[:, usecols[3]], band)
     return data
 end
 # load_data(fi_np::String; usecols=[1, 2, 3]) = load_data(fi_np, usecols)
@@ -248,7 +248,7 @@ function find_nearest(arr, val)
     return idx
 end
 
-function select_time(data1::lc, data2::lc, fi_np::String)
+function select_time(data1::lightcurve, data2::lightcurve, fi_np::String)
 
     time, time_, flux, err = [], [], [], []
     idx_list = []
@@ -282,3 +282,6 @@ function select_time(data1::lc, data2::lc, fi_np::String)
     return time, time_, flux, err
 end
 
+function bin_light_curve()
+
+end
