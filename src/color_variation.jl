@@ -11,6 +11,7 @@ end
 
 """
     color_variation(lc1::lightcurve, lc2::lightcurve, nsigma=3, erron=true, mode="mag";debug=false)
+
 calculate color variation, reference: Su et al., (2023)
 """
 
@@ -19,7 +20,7 @@ calculate color variation, reference: Su et al., (2023)
 # julia> color_variation(lc1, lc2, nsigma, erron, mode)
 # ```
 
-function color_variation(lc1::lightcurve, lc2::lightcurve, nsigma=3, erron=true, mode="mag";debug=false)
+function color_variation(lc1::lightcurve, lc2::lightcurve, nsigma=3, erron=true, mode="mag"; showhist=false, err_method="sun2014")
 
     isEqual(lc1, lc2)
     
@@ -53,6 +54,8 @@ function color_variation(lc1::lightcurve, lc2::lightcurve, nsigma=3, erron=true,
     theta = dx_wmax_all ./ dx_wmin_all
 
     if erron
+        mmd = @. sqrt(dx_wmin_all ^ 2 + dx_wmax_all ^ 2)
+
         # generate 2d matrix and transpose it.
         ex_wmin_1e = repeat(err1', length(err1))
         ex_wmax_1e = repeat(err2' ,length(err2))
@@ -61,25 +64,28 @@ function color_variation(lc1::lightcurve, lc2::lightcurve, nsigma=3, erron=true,
         # select the index where `dt_all>0`.
         ex_wmin_1e, ex_wmax_1e = ex_wmin_1e[idx], ex_wmax_1e[idx]
         ex_wmin_2e, ex_wmax_2e = ex_wmin_2e[idx], ex_wmax_2e[idx]
-        # calculate tanθ.
-        dx_ratio2 = @. (dx_wmax_all / dx_wmin_all) ^ 2
-        mmd = @. sqrt(dx_wmin_all ^ 2 + dx_wmax_all ^ 2)
-        
-        # calculate error ellipse
-        # σ1	
-        err_mmd1 = @. ex_wmin_1e * ex_wmax_1e * sqrt((1+dx_ratio2) / (ex_wmax_1e ^ 2 + ex_wmin_1e ^ 2 * dx_ratio2))
-        # σ2
-        err_mmd2 = @. ex_wmin_2e * ex_wmax_2e * sqrt((1+dx_ratio2) / (ex_wmax_2e ^ 2 + ex_wmin_2e ^ 2 * dx_ratio2))
 
-        err_mmd = @. sqrt(err_mmd1 ^ 2 + err_mmd2 ^2)
+        if err_method == "sun2014"
+            # calculate tanθ.
+            dx_ratio2 = @. (dx_wmax_all / dx_wmin_all) ^ 2        
+            
+            # calculate error ellipse
+            # σ1	
+            err_mmd1 = @. ex_wmin_1e * ex_wmax_1e * sqrt((1+dx_ratio2) / (ex_wmax_1e ^ 2 + ex_wmin_1e ^ 2 * dx_ratio2))
+            # σ2
+            err_mmd2 = @. ex_wmin_2e * ex_wmax_2e * sqrt((1+dx_ratio2) / (ex_wmax_2e ^ 2 + ex_wmin_2e ^ 2 * dx_ratio2))
+            err_mmd = @. sqrt(err_mmd1 ^ 2 + err_mmd2 ^2)
+
+        else
+            err_mmd = @. sqrt(ex_wmin_1e ^ 2 + ex_wmax_1e ^2 + ex_wmin_2e ^ 2 + ex_wmax_2e ^ 2)
+        end
+
         err_mmd_nsigma = nsigma * err_mmd
-        
+
         criterion = mmd .>= err_mmd_nsigma
 
         dt_all = dt_all[criterion]
         theta = theta[criterion]
-
-
     end
     
     
@@ -91,7 +97,7 @@ function color_variation(lc1::lightcurve, lc2::lightcurve, nsigma=3, erron=true,
     num_cut = dt_all_sort
     num_pos = dt_all_sort[idx_pos]
     
-    if debug
+    if showhist
         return (cv=cv(dt_all_sort[idx_pos], theta_sort[idx_pos]), num_all = num_all, num_cut = num_cut, num_pos = num_pos)
     else
         return cv(dt_all_sort[idx_pos], theta_sort[idx_pos])

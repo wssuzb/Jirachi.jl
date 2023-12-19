@@ -37,7 +37,7 @@ function runall(lc1::lightcurve, lc2::lightcurve; sf_bin_edges=1:0.1:5, cv_bin_e
     erron = erron
     
     # cv in flux-Flux
-    cv_flux_res = color_variation(lc1, lc2, nsigma, erron, "flux"; debug=true)
+    cv_flux_res = color_variation(lc1, lc2, nsigma, erron, "flux"; showhist=true)
     
     cv_flux = cv_flux_res.cv
 

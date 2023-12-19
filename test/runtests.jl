@@ -71,7 +71,7 @@ t_fit_1, sf_fit_1 = itp1.t_fit, itp1.sf_fit
 t_fit_2, sf_fit_2 = itp2.t_fit, itp2.sf_fit
 
 # cv in flux-Flux
-cv_flux_res = color_variation(lc1, lc2, nsigma, erron, "flux"; debug=true)
+cv_flux_res = color_variation(lc1, lc2, nsigma, erron, "flux"; showhist=true)
 
 cv_flux = cv_flux_res.cv
 
@@ -90,7 +90,9 @@ bincv_mag = binned_color_variation(cv_mag, cv_bin_edges)
 # function log_tick_formatter(values)
 #     return map(v -> Makie.UnicodeFun.to_superscript(round(Int64, v)), values)
 # end
+struct IntegerTicks end
 
+Makie.get_tickvalues(::IntegerTicks, vmin, vmax) = ceil(Int, vmin) : floor(Int, vmax)
 function mysf()
     # set_theme!(fonts = (; regular = "Times New Roman"))
     # set_theme!(fonts = (; regular = "/Users/suzhenbo/opt/anaconda3/lib/python3.8/site-packages/smplotlib/ttf/AVHersheyComplexMedium.ttf"))
@@ -105,13 +107,15 @@ function mysf()
     yscale=log10, 
     xticksize=8,
     yticksize=8,
+    xticks = LogTicks(IntegerTicks()),
+    yticks = LogTicks(IntegerTicks()),
     # xtickformat=log_tick_formatter,
     # ytickformat=log_tick_formatter,
-    # xminorticks = IntervalsBetween(10),
-    # yminorticks = IntervalsBetween(10),
+    xminorticks = IntervalsBetween(9),
+    yminorticks = IntervalsBetween(9),
     xticksmirrored = true, yticksmirrored = true, 
-    # xminorticksvisible = true,
-    # xminorgridvisible = false,      
+    xminorticksvisible = true,
+    xminorgridvisible = false,      
     # yminorticksvisible = true,
     # yminorgridvisible = false,  
     # xminortickalign = 1,
@@ -146,7 +150,7 @@ end
 
 llc = Cycle([:color, :linestyle], covary=true)
 ssc = Cycle([:color=>:markercolor, :strokecolor=>:color, :marker], covary=true)
-tex_web = merge(theme_web(width=350,
+tex_web = merge(theme_web(width=400,
                             colors=MakiePublication.tableau_10(),
                             linestyles=[nothing, :dash, :dash],
                             ishollowmarkers=[true, true, false],
@@ -162,7 +166,35 @@ fig_sf = with_theme(tex_web) do
     mysf()
 end
 
-save("./test/fig/plot_sf.svg", fig_sf, px_per_unit=4)
+with_theme(tex_web) do
+    f = Figure()
+    ax = Axis(f[1, 1],
+    xscale=log10, 
+    yscale=log10, 
+    xticksize=8,
+    yticksize=8,
+    xticks = LogTicks(IntegerTicks()),
+    yticks = LogTicks(IntegerTicks()),
+    # xtickformat=log_tick_formatter,
+    # ytickformat=log_tick_formatter,
+    limits = (1.43, 3e4, 2, 4e3),
+    xminorticks = IntervalsBetween(9),
+    yminorticks = IntervalsBetween(9),
+    xticksmirrored = true, yticksmirrored = true,
+    # xtickformat = values -> ["100", "1000", "10000"]
+    )
+
+    hst = hist!(ax, num_all, bins= 10 .^ collect(0:0.1:5), fillto=0.1, color=(:slateblue, 0.1))
+    # stephist!(ax, num_all, bins= 10 .^ collect(0:0.1:5), fillto=0.1)
+    # hst.plots[1].attributes.fillto=0.1
+    stephist!(ax, num_cut,bins=10 .^ collect(0:0.1:5), fillto =0.1, color=(:magenta))
+    stephist!(ax, num_pos,fillto =1.0, bins=10 .^ collect(0:0.1:5), color=(:blue), )
+    xlims!(80, 3e4)
+    # ylims!(0.006, 0.1)
+    f
+end
+
+save("./test/fig/plot_sf.pdf", fig_sf, px_per_unit=4)
 # with_theme(mysf, theme_web( width=300,
 # colors=MakiePublication.tableau_10(),
 # linestyles=[nothing, :dash, :dash],

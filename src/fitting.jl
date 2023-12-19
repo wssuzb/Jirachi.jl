@@ -7,6 +7,11 @@ export jmodel, model, fitsf, fitsf_mcmc, find_t_min, find_t_break
 # _model_ = pyeval("""lambda f: lambda a, b, c, d, e: f(a, b, c, d, e)""")
 # model = _model_((t, sf, tau, beta, sigma) -> sqrt.(sf ^ 2 * (1 .- exp.(-(t ./ tau) .^ beta)) .+ 2 * sigma .^ 2))
 
+"""
+    find_t_min(data::binned_result, p::Vector{Float64}; noise_sigma=2, t_fit=10 .^ range(log10(1), log10(6e4), step=0.1))
+
+Find the minimum time.
+"""
 function find_t_min(data::binned_result, p::Vector{Float64}; noise_sigma=2, t_fit=10 .^ range(log10(1), log10(6e4), step=0.1))
 
     idx = all.(isfinite, data.y)
@@ -88,7 +93,7 @@ function fitsf_mcmc(data::lightcurve; nsim=1000, lb = [0, 0, 0, 0.001], ub = [10
     if mode != "none"
         _nseed_ = ifelse(isempty(data.band), 1, Int(only(data.band)) - Int('a') + 1)
 
-        for i=1: nsim
+        Threads.@threads for i=1: nsim
             
             nseed = i + _nseed_ * nsim
             
@@ -130,7 +135,7 @@ function fitsf_mcmc(data::lightcurve; nsim=1000, lb = [0, 0, 0, 0.001], ub = [10
 
     # cheak initial guess of p0 values is under t_max
     # check_bounds(log10(p0[2]), t_br)
-
+    #   TODO: check bounds
     p0_bounds = ifelse(isempty(p0), (lb .+ ub) / 2, p0)
     # p0_bounds = (lb .+ ub) / 3 # we have to start inside the bounds
     # p0_bounds[2] = 10 ^ t_br

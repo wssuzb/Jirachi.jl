@@ -110,7 +110,7 @@ end
 
 
 
-function uniquecount(data)
+function uniquecount(data::T) where{T}
     unique_array = unique(data)
     counts = Dict(unique_array .=> 0)
     for (i, c) in enumerate(data)
@@ -151,22 +151,33 @@ function lc_bootstrapped(data::lightcurve; seed=1, mode="both")
     y_fr_rss = [rand(Normal(y_rss[i], e_rss[i]), 1)[1] for i=1: lastindex(y_rss)]
     idx_sort = sortperm(t_rss)
 
-    if mode == "rss"
+    mode == "rss" && return lightcurve(t_rss[idx_sort], y_rss[idx_sort], e_rss[idx_sort], data.band)
+
+    mode == "both" && return lightcurve(t_rss[idx_sort], y_fr_rss[idx_sort], e_rss[idx_sort], data.band)
+
+    lightcurve(
+        data.time,
+        [rand(Normal(data.flux[i], data.err[i]), 1)[1] for i=1: lastindex(data.flux)],
+        data.err,
+        data.band
+    )
     
-        return lightcurve(t_rss[idx_sort], y_rss[idx_sort], e_rss[idx_sort], data.band)
+    # if mode == "rss"
     
-    elseif mode == "both"
+    #     return lightcurve(t_rss[idx_sort], y_rss[idx_sort], e_rss[idx_sort], data.band)
     
-        return lightcurve(t_rss[idx_sort], y_fr_rss[idx_sort], e_rss[idx_sort], data.band)
+    # elseif mode == "both"
     
-    else
-        return lightcurve(
-            data.time,
-            [rand(Normal(data.flux[i], data.err[i]), 1)[1] for i=1: lastindex(data.flux)],
-            data.err,
-            data.band
-        )
-    end
+    #     return lightcurve(t_rss[idx_sort], y_fr_rss[idx_sort], e_rss[idx_sort], data.band)
+    
+    # else
+    #     return lightcurve(
+    #         data.time,
+    #         [rand(Normal(data.flux[i], data.err[i]), 1)[1] for i=1: lastindex(data.flux)],
+    #         data.err,
+    #         data.band
+    #     )
+    # end
 
 end
 
@@ -197,31 +208,41 @@ end
 # load_data(fi_np::String; usecols=[1, 2, 3]) = load_data(fi_np, usecols)
 
 
-function save_data(arr1::Vector{Float64}, arr2::Vector{Float64}; fi_np::String="./test_data/color_variability.txt")
+function save_data(arr1::Vector{Float64}, arr2::Vector{Float64}, arr3::Vector{Float64}; fi_np::String="./test_data/color_variability.txt")
     res = []
     for i=1: lastindex(arr1)
-        push!(res, [arr1[i], arr2[i]])
+        push!(res, [arr1[i], arr2[i], arr3[i]])
     end
 
     open(fi_np, "w") do io
-        writedlm(io, [map(x->x[1], res) map(x->x[2], res)], ' ')
+        writedlm(io, [map(x->x[1], res) map(x->x[2], res) map(x->x[3], res)], ' ')
     end
 end
 
+function save_data(lc1::lightcurve, lc2::lightcurve; fi_np::String="./test_data/color_variability.txt")
+    res = []
+    for i=1: lastindex(lc1.time)
+        push!(res, [lc1.time[i], lc1.flux[i], lc1.err[i], lc2.time[i], lc2.flux[i], lc2.err[i]])
+    end
+
+    open(fi_np, "w") do io
+        writedlm(io, [map(x->x[1], res) map(x->x[2], res) map(x->x[3], res) map(x->x[4], res) map(x->x[5], res) map(x->x[6], res)], ' ')
+    end
+end
 # save_data(data::sf; fi_np::String="./test_data/color_variability.txt") = save_data(data.tau, data.sf; fi_np)
 # save_data(data::cv; fi_np::String="./test_data/color_variability.txt") = save_data(data.tau, data.color; fi_np)
 
 
-function save_data(arr1::Vector{Float64}, arr2::Vector{Float64}, arr3::Vector{Float64}, arr4::Vector{Float64}; fi_np::String="./test_data/binned_color_variability.txt")
-    res = []
-    for i=1: lastindex(arr1)
-        push!(res, [arr1[i], arr2[i], arr3[i], arr4[i]])
-    end
+# function save_data(arr1::Vector{Float64}, arr2::Vector{Float64}, arr3::Vector{Float64}, arr4::Vector{Float64}; fi_np::String="./test_data/binned_color_variability.txt")
+#     res = []
+#     for i=1: lastindex(arr1)
+#         push!(res, [arr1[i], arr2[i], arr3[i], arr4[i]])
+#     end
 
-    open(fi_np, "w") do io
-        writedlm(io, [map(x->x[1], res) map(x->x[2], res) map(x->x[3], res) map(x->x[4], res)], ' ')
-    end
-end
+#     open(fi_np, "w") do io
+#         writedlm(io, [map(x->x[1], res) map(x->x[2], res) map(x->x[3], res) map(x->x[4], res)], ' ')
+#     end
+# end
 
 # save_data(data::binned_result;  fi_np::String="./test_data/binned_color_variability.txt") = save_data(data.x, data.xerr, data.y, data.yerr; fi_np)
 
@@ -265,7 +286,7 @@ end
 
 
 
-lc_bin_err(dataset::Vector{T}) where T =  sqrt.(sum(dataset .^ 2)) / length(dataset)
+lc_bin_err(err::Vector{T}) where T =  sqrt.(sum(err .^ 2)) / length(err)
 
 function bin_light_curve(lc::lightcurve; lc_edges::AbstractArray)
     _bin_edges = collect(lc_edges)

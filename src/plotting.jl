@@ -1,6 +1,10 @@
 llc = Cycle([:color, :linestyle], covary=true)
 ssc = Cycle([:color=>:markercolor, :strokecolor=>:color, :marker], covary=true)
 
+struct IntegerTicks end
+
+Makie.get_tickvalues(::IntegerTicks, vmin, vmax) = ceil(Int, vmin) : floor(Int, vmax)
+
 
 tex_web = merge(theme_web(width=350,
                             colors=MakiePublication.tableau_10(),
