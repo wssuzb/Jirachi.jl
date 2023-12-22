@@ -118,13 +118,14 @@ function binned_color_variation(data::cv, bin_edges::AbstractArray=1:0.2:5)
 
     
     for i=1: lastindex(bin_all)
-        # binned_yerr[i] = ifelse(isempty(bin_all[i]), 0, err_bootstraped(bin_all[i]))
-        if isempty(bin_all[i])
-            bin_yerr[i] = 0
-        else
-            bin_yerr[i] = err_bootstraped(bin_all[i])
-        end
+        isempty(bin_all[i]) ? (bin_yerr[i] = 0) : (bin_yerr[i] = err_bootstraped(bin_all[i]))
     end
+
+    # if isempty(bin_all[i])
+    #     bin_yerr[i] = 0
+    # else
+    #     bin_yerr[i] = err_bootstraped(bin_all[i])
+    # end
 
     bin_value = bin(median, bin_edges, tau, color)
     _bin_edges = collect(bin_edges)

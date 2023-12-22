@@ -162,6 +162,28 @@ tex_web = merge(theme_web(width=400,
                             ), 
                             theme_latexfonts())
 
+
+lc_web = merge(theme_web(width=1000,
+                            colors=MakiePublication.tableau_10(),
+                            linestyles=[nothing, :dash, :dash],
+                            ishollowmarkers=[true, true, false],
+                            markers=[:circle, :diamond, :rtriangle],
+                            linecycle=llc,
+                            scattercycle=ssc,
+                            markerstrokewidth=0.8, 
+                            heightwidthratio=0.3,
+                            ), theme_latexfonts())
+
+
+with_theme(lc_web) do
+    f = Figure()
+    ax = Axis(f[1, 1],xticksmirrored = true, yticksmirrored = true, )
+    scatter!(lc1.time, lc1.flux, markersize=6,)
+    errorbars!(lc1.time, lc1.flux, lc1.err, linewidth=0.2)
+    f
+end
+
+
 fig_sf = with_theme(tex_web) do 
     mysf()
 end

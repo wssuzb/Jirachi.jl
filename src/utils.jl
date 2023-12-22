@@ -108,8 +108,6 @@ function percentile_16_50_84(x::T) where {T}
     return par(med, low, hig)
 end
 
-
-
 function uniquecount(data::T) where{T}
     unique_array = unique(data)
     counts = Dict(unique_array .=> 0)

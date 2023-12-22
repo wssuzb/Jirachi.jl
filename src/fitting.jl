@@ -12,7 +12,7 @@ export jmodel, model, fitsf, fitsf_mcmc, find_t_min, find_t_break
 
 Find the minimum time.
 """
-function find_t_min(data::binned_result, p::Vector{Float64}; noise_sigma=2, t_fit=10 .^ range(log10(1), log10(6e4), step=0.1))
+function find_t_min(data::binned_result, p::Vector{Float64}; sf_noise_sigma=2, t_fit=10 .^ range(log10(1), log10(6e4), step=0.1))
 
     idx = all.(isfinite, data.y)
     t_new, sf_new = data.x[idx], data.y[idx]
@@ -20,7 +20,7 @@ function find_t_min(data::binned_result, p::Vector{Float64}; noise_sigma=2, t_fi
     t_br = find_t_break(data)
     idx_tmax = t_new .<= t_br
 
-    noise_cut = (noise_sigma * sqrt(2) * p[4])
+    noise_cut = (sf_noise_sigma * sqrt(2) * p[4])
     
     itp = linear_interpolation(sf_new[idx_tmax], t_new[idx_tmax], extrapolation_bc=Line())
 
@@ -81,8 +81,6 @@ check_bounds(p0_tau, t_max) = p0_tau < t_max ? println(" ") : error("The initial
 
 function fitsf_mcmc(data::lightcurve; nsim=1000, lb = [0, 0, 0, 0.001], ub = [10, 2e4, 2, 0.1], sf_bin_edges=1:0.1:5, p0 = [], mode = "both")
 
-
-
     _tmp_sf = zeros(nsim, length(sf_bin_edges)-1)
     _tmp_t = zeros(nsim, length(sf_bin_edges)-1)
 
@@ -117,7 +115,7 @@ function fitsf_mcmc(data::lightcurve; nsim=1000, lb = [0, 0, 0, 0.001], ub = [10
                 # sf_err[i, 2] = percent.hig
             catch y
                 # warn("Exception: ", y) # What to do on error.
-                println("pass")
+                println("Warning!!!")
             end
         end
 
@@ -132,13 +130,15 @@ function fitsf_mcmc(data::lightcurve; nsim=1000, lb = [0, 0, 0, 0.001], ub = [10
     t_br = find_t_break(binsf)
     
     idx_tmax = t_new .<= t_br
+    
+    # cheak bounds of tau values is under t_max
+    ub[2] = ub[2] >= (10 ^ t_br) ? (10 ^ t_br) : ub[2]
+    p0_bounds = isempty(p0) ? (lb .+ ub) / 2 : p0
 
-    # cheak initial guess of p0 values is under t_max
-    # check_bounds(log10(p0[2]), t_br)
-    #   TODO: check bounds
-    p0_bounds = ifelse(isempty(p0), (lb .+ ub) / 2, p0)
-    # p0_bounds = (lb .+ ub) / 3 # we have to start inside the bounds
-    # p0_bounds[2] = 10 ^ t_br
+    println(" ")
+    println(p0_bounds)
+    println(" ")
+
     wt = 1  ./ err_new[idx_tmax] .^ 2
     fit_bounds = curve_fit(jmodel, 10 .^ t_new[idx_tmax], sf_new[idx_tmax], wt, p0_bounds, lower=lb, upper=ub)
 

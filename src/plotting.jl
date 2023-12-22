@@ -1,3 +1,5 @@
+export theme_sf, theme_hist, theme_lc, IntegerTicks
+
 llc = Cycle([:color, :linestyle], covary=true)
 ssc = Cycle([:color=>:markercolor, :strokecolor=>:color, :marker], covary=true)
 
@@ -5,8 +7,7 @@ struct IntegerTicks end
 
 Makie.get_tickvalues(::IntegerTicks, vmin, vmax) = ceil(Int, vmin) : floor(Int, vmax)
 
-
-tex_web = merge(theme_web(width=350,
+theme_lc = merge(theme_web(width=1000,
                             colors=MakiePublication.tableau_10(),
                             linestyles=[nothing, :dash, :dash],
                             ishollowmarkers=[true, true, false],
@@ -14,9 +15,14 @@ tex_web = merge(theme_web(width=350,
                             linecycle=llc,
                             scattercycle=ssc,
                             markerstrokewidth=0.8, 
-                            heightwidthratio=0.9,
-                            ), 
-                            theme_latexfonts())
+                            heightwidthratio=0.3,
+                            ), theme_latexfonts())
+
+theme_sf = merge(theme_web(width=350, colors=MakiePublication.tableau_10(),linestyles=[nothing, :dash, :dash], ishollowmarkers=[true, true, false], markers=[:circle, :diamond, :rtriangle], linecycle=llc, scattercycle=ssc, markerstrokewidth=0.8, heightwidthratio=0.9,), theme_latexfonts())
+
+theme_hist = merge(theme_web(width=350, colors=MakiePublication.tableau_10(),linestyles=[nothing, :dash, :dash], ishollowmarkers=[true, true, false], markers=[:circle, :diamond, :rtriangle], linecycle=llc, scattercycle=ssc, markerstrokewidth=0.8, heightwidthratio=0.9,), theme_latexfonts())
+
+
 
 function mysf()
     fig_sf = with_theme(tex_web) do 
