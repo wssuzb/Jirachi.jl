@@ -30,6 +30,7 @@ include("fitting.jl")
 include("showinfo.jl")
 include("run.jl")
 include("plotting.jl")
+include("generateDRW.jl")
 
 # const so = PyNULL()
 
@@ -45,6 +46,8 @@ export color_variation, binned_color_variation, structure_function, binned_struc
 export jmodel, model, fitsf, fitsf_mcmc, find_t_min, find_t_break
 
 export runall
+
+export stochastic_process
 
 export IntegerTicks, theme_lc, theme_sf, plotlc, plotsf, plotcv
 
