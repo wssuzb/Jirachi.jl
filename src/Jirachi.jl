@@ -27,8 +27,8 @@ include("structure_function.jl")
 include("color_variation.jl")
 include("fractional_variability.jl")
 include("fitting.jl")
+include("showinfo.jl")
 include("run.jl")
-
 include("plotting.jl")
 
 # const so = PyNULL()
