@@ -100,7 +100,7 @@ function runall(lc1::lightcurve, lc2::lightcurve; sf_bin_edges=1:0.1:5, cv_bin_e
     end
 
     result = (
-        sf = sf, cv = cv, fit = fit, par = par, sf_min = [sf_min_1, sf_min_2], t_min = [t_min_1, t_min_2], t_max =  [t_break_1, t_break_2], num_all = num_all, num_cut = num_cut, num_pos = num_pos
+        sf = _sf, cv = _cv, fit = _fit, par = _par, sf_min = [sf_min_1, sf_min_2], t_min = [t_min_1, t_min_2], t_max =  [t_break_1, t_break_2], num_all = num_all, num_cut = num_cut, num_pos = num_pos
     )
     
     return result
