@@ -45,18 +45,6 @@ end
 lightcurve(time, flux, err) = lightcurve(time, flux, err, [])
 
 
-# function lightcurve(time, flux, err)
-#     return (
-#         time = time,
-#         flux = flux,
-#         err = err,
-#         band = band,
-#         t_med = median(time),
-#         t_mean = mean(time),
-#     )
-# end
-
-
 # # Examples
 # ```jldoctest
 # julia> cv(tau, color)
