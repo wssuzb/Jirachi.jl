@@ -14,6 +14,7 @@ include("../src/run.jl")
 using UncertainData, Random, Peaks, LaTeXStrings, DelimitedFiles, LsqFit, Interpolations, StatsBase, HDF5, Printf, LinearAlgebra, CairoMakie, MakiePublication
 
 include("../src/fitting.jl")
+include("../src/plotting.jl")
 
 band = ["g", "r", "i", "z"]
 
@@ -29,10 +30,11 @@ end
 # lc2 = load_data("/Users/suzhenbo/Mylibrary/Projects/lib_julia_external/VariabilityTools/test_data/lc/montano22_n1_z_binned.txt", [1, 3, 4]; band = "z")
 
 
-lc1 = load_data("./test/data/montano22_n1_i_binned.txt", [1, 3, 4]; band = "i")
+
+lc1 = load_data("./test/data/montano22_n1_g_binned.txt", [1, 3, 4]; band = "i")
 # lc1.time =  lc1.time* 3600 * 24
 
-lc2 = load_data("./test/data/montano22_n1_z_binned.txt", [1, 3, 4]; band = "z")
+lc2 = load_data("./test/data/montano22_n1_r_binned.txt", [1, 3, 4]; band = "z")
 # lc2.time =  lc2.time * 3600 * 24
 
 # lc1 == lc1_
@@ -48,6 +50,31 @@ fi_np::String="./test/run_all.h5"
 lower_bounds = [0, 0, 0, 0.001]
 upper_bounds = [10, 2e4, 2, 0.1]
 p0 = [1, 1e3, 1, 0.05]
+
+
+t_cad = 103.68 #mean(diff(lc.time))
+t_start = 0 - (t_cad / 2) #lc.time[1] - (t_cad / 2)
+t_end = 25000 + (t_cad /2 )
+lc_edges = t_start:t_cad:t_end
+
+lc1 = load_data("../../archive_data/ngc4395/Montano22_night1/g_4395.txt", [1, 2, 3];  band="g")
+lc1.time = lc1.time .- lc1.time[1]
+lc1.time = round.(lc1.time * 24 * 3600, digits=2)
+
+println("lc1 time min: ", minimum(lc1.time), ", time max: ", maximum(lc1.time))
+
+lc2 = load_data("../../archive_data/ngc4395/Montano22_night1/r_4395.txt", [1, 2, 3]; band="r")
+lc2.time = lc2.time .- lc2.time[1]
+lc2.time = round.(lc2.time * 24 * 3600, digits=2)
+
+println("lc2 time min: ", minimum(lc2.time), ", time max: ", maximum(lc2.time))
+
+lc1_bin = bin_light_curve(lc1; lc_edges = lc_edges)
+lc2_bin = bin_light_curve(lc2; lc_edges = lc_edges)
+
+# lc1_bin, lc2_bin = get_common_lc(lc1_bin, lc2_bin)
+fig = plotlc(lc1, lc1_bin, lc2, lc2_bin; label=["lc1",  "lc1_bin","lc2", "lc2_bin"], lc_edges=lc_edges, xlim=(0, 1e4))
+savefig("./test/fig/lc.pdf", fig)
 
 
 fit_sf1 = fitsf_mcmc(lc1; nsim=nsim, lb = lower_bounds , ub = upper_bounds, sf_bin_edges=sf_bin_edges, p0=p0, mode = mode)

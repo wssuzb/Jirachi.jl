@@ -1,4 +1,4 @@
-export par, lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time, bin_light_curve, get_common_lc
+export par, lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time, bin_light_curve, get_common_lc, bin_lc_edges, remove_lc_outlier
 # """
 #     par(med, low, hig)
 # structure for loading statistical results.
@@ -7,6 +7,19 @@ export par, lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, sa
 # ```jldoctest
 # julia> par(med, low, hig)
 # ```
+
+
+# @kwdef mutable struct lc_edges where{T}
+#     binsize::T
+#     t_start::T
+#     t_end::T
+# end
+
+# lc_edges(lc_bin::lc_edges) = lc_bin.t_start - (lc_bin.binsize / 2):lc_bin.binsize:lc_bin.t_end + (lc_bin.binsize / 2)
+
+bin_lc_edges(binsize, t_start, t_end) = (t_start - (binsize / 2)):binsize:(t_end + (binsize / 2))
+
+
 struct par
     med::Float64
     low::Float64
@@ -31,7 +44,22 @@ structure for loading light curve.
 end
 lightcurve(time, flux, err) = lightcurve(time, flux, err, [])
 
+# function lightcurve(time, flux, err)
+#     return (
+#         time = time,
+#         flux = flux,
+#         err = err,
+#         band = band,
+#         t_med = median(time),
+#         t_mean = mean(time),
+#     )
+# end
 
+function show(lc::lightcurve)
+    
+    #TODO: print msg,
+
+end
 
 # # Examples
 # ```jldoctest
@@ -69,8 +97,9 @@ end
     xerr::Vector{Float64}
     y::Vector{Float64}
     yerr::Vector{Float64}
-    yerr_::Vector{Float64}
+    yerr_::Vector{Float64} # save yerr with low and high
 end
+
 binned_result(x, xerr, y, yerr) = binned_result(x, xerr, y, yerr, [])
 
 # function save_struct(data::Any, fi_np::String)
@@ -318,3 +347,21 @@ end
 #     ind2 = indexin(common_t, arr2)
 #     return ind1, ind2
 # end
+
+
+function remove_lc_outlier(lc::lightcurve; cut=2, criteria="err")
+    if criteria == "err"
+        mean_err, std_err = mean(lc.err), std(lc.err)
+        idx = @. abs(lc.err - mean_err) <= (cut * std_err)
+        lc.time = lc.time[idx]
+        lc.flux = lc.flux[idx]
+        lc.err = lc.err[idx]
+    else
+        mean_flux, std_flux = mean(lc.flux), std(lc.flux)
+        idx = @. abs(lc.flux - mean_flux) <= (cut * std_flux)
+        lc.time = lc.time[idx]
+        lc.flux = lc.flux[idx]
+        lc.err = lc.err[idx]
+    end
+    return lc
+end

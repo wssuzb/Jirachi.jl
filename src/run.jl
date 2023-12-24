@@ -1,6 +1,6 @@
 export  runall
 
-function runall(lc1::lightcurve, lc2::lightcurve; sf_bin_edges=1:0.1:5, cv_bin_edges=1:0.2:5, nsigma=3, erron=true, nsim=10, fi_np::String="./run_all.h5", lower_bounds = [0, 0, 0, 0.001], upper_bounds = [10, 2e4, 2, 0.1], p0=[], mode="both")
+function runall(lc1::lightcurve, lc2::lightcurve; sf_bin_edges=1:0.1:5, cv_bin_edges=1:0.2:5, nsigma=3, erron=true, nsim=10, fi_np::String="./run_all.h5", lower_bounds = [0, 0, 0, 0.001], upper_bounds = [10, 2e4, 2, 0.1], p0=[], mode="both", t_fit = 10 .^ range(log10(1), log10(6e4), step=0.1))
 
     # sf1 = structure_function(lc1.time, lc1.flux)
     # sf2 = structure_function(lc2.time, lc2.flux)
@@ -21,8 +21,8 @@ function runall(lc1::lightcurve, lc2::lightcurve; sf_bin_edges=1:0.1:5, cv_bin_e
     t_break_1 = find_t_break(binsf1)
     t_break_2 = find_t_break(binsf2)
     
-    itp1 = find_t_min(binsf1, par_1)
-    itp2 = find_t_min(binsf2, par_2)
+    itp1 = find_t_min(binsf1, par_1; t_fit=t_fit)
+    itp2 = find_t_min(binsf2, par_2; t_fit=t_fit)
 
     t_min_1, sf_min_1 = itp1.t_min, itp1.sf_min
     t_min_2, sf_min_2 = itp2.t_min, itp2.sf_min

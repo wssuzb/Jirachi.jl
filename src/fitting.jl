@@ -133,9 +133,11 @@ function fitsf_mcmc(data::lightcurve; nsim=1000, lb = [0, 0, 0, 0.001], ub = [10
     
     # cheak bounds of tau values is under t_max
     ub[2] = ub[2] >= (10 ^ t_br) ? (10 ^ t_br) : ub[2]
+    
     p0_bounds = isempty(p0) ? (lb .+ ub) / 2 : p0
 
     println(" ")
+    println(ub)
     println(p0_bounds)
     println(" ")
 

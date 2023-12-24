@@ -14,6 +14,8 @@ using Peaks
 using Printf
 using LsqFit
 using LinearAlgebra
+# using CairoMakie
+# using MakiePublication
 # using PyCall
 
 # ENV["PYTHON"] = "/usr/bin/python"
@@ -27,6 +29,8 @@ include("fractional_variability.jl")
 include("fitting.jl")
 include("run.jl")
 
+# include("plotting.jl")
+
 # const so = PyNULL()
 
 # function __init__()
@@ -34,13 +38,15 @@ include("run.jl")
 # end
 
 
-export par, lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time, get_common_lc, bin_light_curve
+export par, lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time, get_common_lc, bin_light_curve, bin_lc_edges, remove_lc_outlier
 
 export color_variation, binned_color_variation, structure_function, binned_structure_function, err_bootstraped, flux2mag
 
 export jmodel, model, fitsf, fitsf_mcmc, find_t_min, find_t_break
 
 export runall
+
+# export IntegerTicks, theme_lc, theme_sf
 
 
 end
