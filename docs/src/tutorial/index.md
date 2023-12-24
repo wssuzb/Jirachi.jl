@@ -18,7 +18,7 @@ z_lc.time = round.(z_lc.time * 24 * 3600, digits=2)
 z_lc.time = z_lc.time .- z_lc.time[1]
 ```
 
-## Get the light curves binned
+- Get the light curves binned
 
 ```julia
 t_binsize = 103.68
@@ -30,7 +30,7 @@ z_lc_bin = bin_light_curve(z_lc; lc_edges = lc_edges)
 lc1_bin, lc2_bin = get_common_lc(i_lc_bin, z_lc_bin)
 ```
 
-## check and plot it !
+- check and plot it !
 
 ```julia
 plotlc(i_lc, i_lc_bin, z_lc, z_lc_bin; 
@@ -43,9 +43,9 @@ plotlc(i_lc, i_lc_bin, z_lc, z_lc_bin;
 
 ![lc](../assets/fig/lc_check_i_z.svg)
 
-### Begin calculating structure function!
+## Begin calculating structure function!
 
-### input parameters
+- input parameters
 
 ```julia
 # structure function 
@@ -72,7 +72,7 @@ fi_np::String="./data/run_i_z.h5"
 
 
 
-### Structure function
+- Structure function
 
 ```julia
 fit_sf1 = fitsf_mcmc(lc1_bin; nsim=nsim, lb = lower_bounds , ub = upper_bounds, sf_bin_edges=sf_bin_edges, p0=p0, mode = mode)
@@ -101,8 +101,7 @@ proper_time = [maximum([t_min_1, t_min_2]), minimum([t_break_1, t_break_2])]
 ```
 
 
-
-## and show it
+- and we can plot SF by
 
 ```julia
 plotsf(binsf1, binsf2; fitsf1=[t_fit_1, sf_fit_1], fitsf2=[t_fit_2, sf_fit_2], proper_time = proper_time)
@@ -110,7 +109,7 @@ plotsf(binsf1, binsf2; fitsf1=[t_fit_1, sf_fit_1], fitsf2=[t_fit_2, sf_fit_2], p
 
 ![sf](../assets/fig/plot_sf.svg)
 
-### calculating color variation
+## calculating color variation
 
 ```julia
 nsigma = nsigma
