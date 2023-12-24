@@ -2,12 +2,6 @@ export  runall
 
 function runall(lc1::lightcurve, lc2::lightcurve; sf_bin_edges=1:0.1:5, cv_bin_edges=1:0.2:5, nsigma=3, erron=true, nsim=10, fi_np::String="./run_all.h5", lower_bounds = [0, 0, 0, 0.001], upper_bounds = [10, 2e4, 2, 0.1], p0=[], mode="both", t_fit = 10 .^ range(log10(1), log10(6e4), step=0.1))
 
-    # sf1 = structure_function(lc1.time, lc1.flux)
-    # sf2 = structure_function(lc2.time, lc2.flux)
-    
-    # binsf1 = binned_structure_function(sf1, sf_bin_edges)
-    # binsf2 = binned_structure_function(sf2, sf_bin_edges)
-    # if isempty(sf_info)
 
     fit_sf1 = fitsf_mcmc(lc1; nsim=nsim, lb = lower_bounds , ub = upper_bounds, sf_bin_edges=sf_bin_edges, p0=p0, mode = mode)
     fit_sf2 = fitsf_mcmc(lc2; nsim=nsim, lb = lower_bounds, ub = upper_bounds, sf_bin_edges=sf_bin_edges, p0=p0, mode = mode)
@@ -30,8 +24,8 @@ function runall(lc1::lightcurve, lc2::lightcurve; sf_bin_edges=1:0.1:5, cv_bin_e
     t_fit_1, sf_fit_1 = itp1.t_fit, itp1.sf_fit
     t_fit_2, sf_fit_2 = itp2.t_fit, itp2.sf_fit
 
-    # t_used_min = maximum([t_min_1, t_min_2])
-    # t_used_max = minimum([t_break_1, t_break_2])
+    t_used_min = maximum([t_min_1, t_min_2])
+    t_used_max = minimum([t_break_1, t_break_2])
 
     nsigma = nsigma
     erron = erron

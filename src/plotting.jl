@@ -1,36 +1,8 @@
 export theme_sf, theme_hist, theme_lc, IntegerTicks, plotlc, plotsf, plotcv
 
-
 struct IntegerTicks end
 
 Makie.get_tickvalues(::IntegerTicks, vmin, vmax) = ceil(Int, vmin) : floor(Int, vmax)
-
-
-# theme_lc = merge(theme_web(width=1000,
-#                             colors=MakiePublication.tableau_10(),
-#                             linestyles=[nothing, :dash, :dash],
-#                             ishollowmarkers=[true, true, false],
-#                             markers=[:circle, :diamond, :rtriangle],
-#                             linecycle=Cycle([:color, :linestyle], covary=true),
-#                             scattercycle=Cycle([:color=>:markercolor, :strokecolor=>:color, :marker], covary=true),
-#                             markerstrokewidth=0.8, 
-#                             heightwidthratio=0.3,
-#                             ), theme_latexfonts())
-
-
-# theme_hist = merge(theme_web(width=350, colors=MakiePublication.tableau_10(),linestyles=[nothing, :dash, :dash], ishollowmarkers=[true, true, false], markers=[:circle, :diamond, :rtriangle], linecycle=Cycle([:color, :linestyle], covary=true), scattercycle=Cycle([:color=>:markercolor, :strokecolor=>:color, :marker], covary=true), markerstrokewidth=0.8, heightwidthratio=0.9,), theme_latexfonts())
-
-# theme_llc = merge(theme_web(width=1000,
-#                             colors=MakiePublication.COLORS[5],
-#                             linestyles=[:dash, :dash],
-#                             ishollowmarkers=[true, true],
-#                             markers=[:circle, :diamond],
-#                             linecycle=Cycle([:color, :linestyle], covary=true),
-#                             scattercycle=Cycle([:color=>:markercolor, :strokecolor=>:color, :marker], covary=true),
-#                             markerstrokewidth=0.8, 
-#                             heightwidthratio=0.3,
-#                             ), theme_latexfonts())
-
 
 function plotlc(lc::lightcurve...; label=[], xlim=[], ms=2, lw=0.3, width=1000, hwratio=0.5, ft=20, lc_edges::AbstractArray=[], save_fig_path::String="./check_lc.pdf", save_fig::Bool=false)
 

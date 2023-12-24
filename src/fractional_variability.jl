@@ -1,5 +1,4 @@
 export fractional_variability
-# using Unitful
 
 function fractional_variability(flux, err)
     """

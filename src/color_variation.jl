@@ -15,11 +15,6 @@ end
 calculate color variation, reference: Su et al., (2023)
 """
 
-# # Examples
-# ```jldoctest
-# julia> color_variation(lc1, lc2, nsigma, erron, mode)
-# ```
-
 function color_variation(lc1::lightcurve, lc2::lightcurve, nsigma=3, erron=true, mode="mag"; showhist=false, err_method="sun2014")
 
     isEqual(lc1, lc2)
@@ -120,12 +115,6 @@ function binned_color_variation(data::cv, bin_edges::AbstractArray=1:0.2:5)
     for i=1: lastindex(bin_all)
         isempty(bin_all[i]) ? (bin_yerr[i] = 0) : (bin_yerr[i] = err_bootstraped(bin_all[i]))
     end
-
-    # if isempty(bin_all[i])
-    #     bin_yerr[i] = 0
-    # else
-    #     bin_yerr[i] = err_bootstraped(bin_all[i])
-    # end
 
     bin_value = bin(median, bin_edges, tau, color)
     _bin_edges = collect(bin_edges)

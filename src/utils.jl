@@ -1,36 +1,7 @@
 export par, lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time, bin_light_curve, get_common_lc, bin_lc_edges, remove_lc_outlier
-# """
-#     par(med, low, hig)
-# structure for loading statistical results.
-# """
-# # Examples
-# ```jldoctest
-# julia> par(med, low, hig)
-# ```
-
-
-# @kwdef mutable struct lc_edges where{T}
-#     binsize::T
-#     t_start::T
-#     t_end::T
-# end
-
-# lc_edges(lc_bin::lc_edges) = lc_bin.t_start - (lc_bin.binsize / 2):lc_bin.binsize:lc_bin.t_end + (lc_bin.binsize / 2)
 
 bin_lc_edges(binsize, t_start, t_end) = (t_start - (binsize / 2)):binsize:(t_end + (binsize / 2))
 
-
-struct par
-    med::Float64
-    low::Float64
-    hig::Float64
-end
-
-
-# # Examples
-# ```jldoctest
-# julia> lightcurve(time, flux, err)
-# ```
 """
     lightcurve(time, flux, err)
 
@@ -45,30 +16,11 @@ end
 lightcurve(time, flux, err) = lightcurve(time, flux, err, [])
 
 
-# # Examples
-# ```jldoctest
-# julia> cv(tau, color)
-# ```
-# """
-#     cv(tau, color)
-
-# structure for loading color variation temp results.
-
-# """
 struct cv
     tau::Vector{Float64}
     color::Vector{Float64}
 end
 
-# # Examples
-# ```jldoctest
-# julia> sf(tau, sf)
-# ```
-# """
-#     sf(tau, sf)
-
-# structure for loading structure function results.
-# """
 struct sf
     tau::Vector{Float64}
     sf::Vector{Float64}
@@ -80,44 +32,14 @@ end
     xerr::Vector{Float64}
     y::Vector{Float64}
     yerr::Vector{Float64}
-    yerr_::Vector{Float64} # save yerr with low and high
 end
 
-binned_result(x, xerr, y, yerr) = binned_result(x, xerr, y, yerr, [])
 
-# function save_struct(data::Any, fi_np::String)
-#     """
-#     Convert struct to dictionary.
-#     """
-#     struct_to_dict(s) = Dict(key => getfield(s, key) for key in propertynames(s))
-
-#     test = struct_to_dict(data)
-#     open(fi_np, "w") do io
-#         JSON3.write(io, test)
-#     end
-
-#     println("File have save to: " * "\"" * fi_np * "\"")
-#     println(" ")
-#     println("The data set: ")
-#     dump(data)
-#     println(" ")
-#     return test
-# end
-
-# Examples
-# ```jldoctest
-# julia> percentile_16_50_84([1, 2, 3])
-# ```
-# """
-#     percentile_16_50_84(array)
-
-# return 16%, 50% and 84% values with given array.
-# """
 function percentile_16_50_84(x::T) where {T}
     med = percentile(x, 50)
     low = med - percentile(x, 16)
     hig = percentile(x, 84) - med
-    return par(med, low, hig)
+    return (med=med, low=low, hig=hig)
 end
 
 function uniquecount(data::T) where{T}
@@ -129,12 +51,6 @@ function uniquecount(data::T) where{T}
     return (keys=collect(keys(counts)), vals=collect(values(counts)))
  end
 
-
-
-#  # Examples
-#  ```jldoctest
-#  julia> lc_bootstrapped(data)
-#  ```
 
 """
     lc_bootstrapped(data::lightcurve; seed=1, mode="both")
@@ -174,9 +90,6 @@ function lc_bootstrapped(data::lightcurve; seed=1, mode="both")
     
 end
 
-# """
-#     idx = findmat(x->x > 0, dt_all)
-# """
 
 function findmat(f, A::AbstractMatrix)
     m,n = size(A)
@@ -198,30 +111,6 @@ function load_data(fi_np::String, usecols=[1, 2, 3]; band=[])
     data = lightcurve(tmp[:, usecols[1]], tmp[:, usecols[2]], tmp[:, usecols[3]], band)
     return data
 end
-# load_data(fi_np::String; usecols=[1, 2, 3]) = load_data(fi_np, usecols)
-
-
-# function save_data(arr1::Vector{Float64}, arr2::Vector{Float64}, arr3::Vector{Float64}; fi_np::String="./test_data/color_variability.txt")
-#     res = []
-#     for i=1: lastindex(arr1)
-#         push!(res, [arr1[i], arr2[i], arr3[i]])
-#     end
-
-#     open(fi_np, "w") do io
-#         writedlm(io, [map(x->x[1], res) map(x->x[2], res) map(x->x[3], res)], ' ')
-#     end
-# end
-
-# function save_data(lc1::lightcurve, lc2::lightcurve; fi_np::String="./test_data/color_variability.txt")
-#     res = []
-#     for i=1: lastindex(lc1.time)
-#         push!(res, [lc1.time[i], lc1.flux[i], lc1.err[i], lc2.time[i], lc2.flux[i], lc2.err[i]])
-#     end
-
-#     open(fi_np, "w") do io
-#         writedlm(io, [map(x->x[1], res) map(x->x[2], res) map(x->x[3], res) map(x->x[4], res) map(x->x[5], res) map(x->x[6], res)], ' ')
-#     end
-# end
 
 
 function hcatlc(lc::lightcurve)
@@ -269,16 +158,13 @@ function select_time(data1::lightcurve, data2::lightcurve, fi_np::String)
         print("WARNING")
     end
 
-    data = []
-    for i=1: lastindex(time)
-        push!(data, [time[i], time_[i], flux[i], err[i]])
-    end
-
+    data = hcat(time, time_, flux, err)
+    
     open(fi_np, "w") do io
-        writedlm(io, [map(x->x[1], data) map(x->x[2], data) map(x->x[3], data) map(x->x[4], data)], ' ')
+        writedlm(io, data)
     end
 
-    return time, time_, flux, err
+    return data
 end
 
 
@@ -294,31 +180,14 @@ function bin_light_curve(lc::lightcurve; lc_edges::AbstractArray)
     err_bin = bin(lc_bin_err, lc_edges, lc.time, lc.err)
     return lightcurve(bin_center, flux_bin, err_bin, lc.band)
 end
-# bin_light_curve(lc, lc_edges) = bin_light_curve(lc::lightcurve; lc_edges::AbstractArray)
+
 
 function get_common_lc(lc1::lightcurve, lc2::lightcurve)
     # find the index of values that are finite.
     idx = all(!isnan, hcat(lc1.flux, lc2.flux); dims=2) |> vec
     
     return lightcurve(lc1.time[idx], lc1.flux[idx], lc1.err[idx], lc1.band), lightcurve(lc2.time[idx], lc2.flux[idx], lc2.err[idx], lc2.band)
-
-    # lc1.time, lc1.flux, lc1.err = lc1.time[idx], lc1.flux[idx], lc1.err[idx]
-    # lc2.time, lc2.flux, lc2.err = lc2.time[idx], lc2.flux[idx], lc2.err[idx]
-    
-    # lc1.time[t1_idx] ∩ lc2.time[t2_idx]
-    # filter(row -> all(x -> !(x isa Number && isnan(x)), row), t_bin)
-    # return lc1, lc2
 end
-
-# function get_common_lc(arr1::T, arr2::T) where{T}
-#     # find the common values of two given array: arr1, arr2
-#     common_t = intersect(arr1, arr2)
-   
-#     # find the index of the common values in: arr1, arr2, respectively.
-#     ind1 = indexin(common_t, arr1)
-#     ind2 = indexin(common_t, arr2)
-#     return ind1, ind2
-# end
 
 
 function remove_lc_outlier(lc::lightcurve; cut=2, criteria="err")

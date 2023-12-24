@@ -46,16 +46,6 @@ function binned_structure_function(data::sf, bin_edges::AbstractArray=1:0.1:5)
         isempty(bin_all[i]) ? (bin_yerr[i] = 0) : (bin_yerr[i] = std(bin_all[i]) / sqrt(length(bin_all[i])))
     end
 
-    # for i=1: lastindex(bin_all) 
-        # binned_yerr[i] = ifelse(isempty(bin_all[i]), 0, err_bootstraped(bin_all[i]))
-        # if isempty(bin_all[i])
-        #     bin_yerr[i] = 0
-        # else
-        #     bin_yerr[i] = std(bin_all[i]) / sqrt(length(bin_all[i]))
-        #     # bin_yerr[i] = err_bootstraped(bin_all[i])
-        # end
-    # end
-
     bin_value = bin(mean, bin_edges, tau, color)
     _bin_edges = collect(bin_edges)
     bin_width = round.([(_bin_edges[i+1] - _bin_edges[i]) / 2 for i=1: lastindex(_bin_edges)-1], digits=2)
