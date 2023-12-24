@@ -32,19 +32,19 @@ theme_hist = merge(theme_web(width=350, colors=MakiePublication.tableau_10(),lin
 #                             ), theme_latexfonts())
 
 
-
-function plotlc(lc::lightcurve...; label=[], xlim=[], ms=2, lw=0.3, width=1000, hwratio=0.5, ft=20, lc_edges::AbstractArray=[])
+function plotlc(lc::lightcurve...; label=[], xlim=[], ms=2, lw=0.3, width=1000, hwratio=0.5, ft=20, lc_edges::AbstractArray=[], save_fig_path::String="./check_lc.pdf", save_fig::Bool=false)
 
     theme_llc = merge(
         theme_web(
         width=width,
         colors=MakiePublication.tol_bright(),
-        linestyles=[:dash, :dash],
+        # colors=[:black,]
+        linestyles=[:dot, :dash],
         ishollowmarkers=[true, false],
         markers=[:circle, :diamond],
         linecycle=Cycle([:color, :linestyle], covary=true),
         scattercycle=Cycle([:color=>:markercolor, :strokecolor=>:color, :marker], covary=true),
-        markerstrokewidth=0.8, 
+        markerstrokewidth=0.2, 
         heightwidthratio=hwratio
         ), 
         theme_latexfonts()
@@ -69,8 +69,9 @@ function plotlc(lc::lightcurve...; label=[], xlim=[], ms=2, lw=0.3, width=1000, 
         yticksmirrored = true; kwargs...)
 
         for (i, x) in enumerate(lc)
-            sca = scatter!(ax, x.time, x.flux, markersize=ms, label=label[i])
-            ebar = errorbars!(ax, x.time, x.flux, x.err, linewidth=lw)
+            lines!(ax, x.time, x.flux, linewidth=lw)
+            scatter!(ax, x.time, x.flux, markersize=ms, label=label[i])
+            errorbars!(ax, x.time, x.flux, x.err, linewidth=lw)
         end
 
         axislegend(ax, nbanks = 2)
@@ -80,7 +81,8 @@ function plotlc(lc::lightcurve...; label=[], xlim=[], ms=2, lw=0.3, width=1000, 
         f
     end
 
-    # savefig("./figure/lc_test.pdf", fig)
+    save_fig ? savefig(save_fig_path, fig) : println(" ")
+    
     return fig
 end
 

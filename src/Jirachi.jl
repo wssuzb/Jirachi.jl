@@ -14,8 +14,8 @@ using Peaks
 using Printf
 using LsqFit
 using LinearAlgebra
-# using CairoMakie
-# using MakiePublication
+using CairoMakie
+using MakiePublication
 # using PyCall
 
 # ENV["PYTHON"] = "/usr/bin/python"
@@ -29,7 +29,7 @@ include("fractional_variability.jl")
 include("fitting.jl")
 include("run.jl")
 
-# include("plotting.jl")
+include("plotting.jl")
 
 # const so = PyNULL()
 
@@ -46,7 +46,7 @@ export jmodel, model, fitsf, fitsf_mcmc, find_t_min, find_t_break
 
 export runall
 
-# export IntegerTicks, theme_lc, theme_sf
+export IntegerTicks, theme_lc, theme_sf, plotlc
 
 
 end

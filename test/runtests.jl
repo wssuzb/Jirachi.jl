@@ -73,7 +73,7 @@ lc1_bin = bin_light_curve(lc1; lc_edges = lc_edges)
 lc2_bin = bin_light_curve(lc2; lc_edges = lc_edges)
 
 # lc1_bin, lc2_bin = get_common_lc(lc1_bin, lc2_bin)
-fig = plotlc(lc1, lc1_bin, lc2, lc2_bin; label=["lc1",  "lc1_bin","lc2", "lc2_bin"], lc_edges=lc_edges, xlim=(0, 1e4))
+fig = plotlc(lc1, lc1_bin, lc2, lc2_bin; label=["lc1",  "lc1_bin","lc2", "lc2_bin"], lc_edges=lc_edges, ms=1, lw=0.05)
 savefig("./test/fig/lc.pdf", fig)
 
 
