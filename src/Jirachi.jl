@@ -46,7 +46,7 @@ export jmodel, model, fitsf, fitsf_mcmc, find_t_min, find_t_break
 
 export runall
 
-export IntegerTicks, theme_lc, theme_sf, plotlc, plotsf
+export IntegerTicks, theme_lc, theme_sf, plotlc, plotsf, plotcv
 
 
 end

@@ -1,4 +1,4 @@
-export theme_sf, theme_hist, theme_lc, IntegerTicks, plotlc, plotsf
+export theme_sf, theme_hist, theme_lc, IntegerTicks, plotlc, plotsf, plotcv
 
 
 struct IntegerTicks end
@@ -6,19 +6,19 @@ struct IntegerTicks end
 Makie.get_tickvalues(::IntegerTicks, vmin, vmax) = ceil(Int, vmin) : floor(Int, vmax)
 
 
-theme_lc = merge(theme_web(width=1000,
-                            colors=MakiePublication.tableau_10(),
-                            linestyles=[nothing, :dash, :dash],
-                            ishollowmarkers=[true, true, false],
-                            markers=[:circle, :diamond, :rtriangle],
-                            linecycle=Cycle([:color, :linestyle], covary=true),
-                            scattercycle=Cycle([:color=>:markercolor, :strokecolor=>:color, :marker], covary=true),
-                            markerstrokewidth=0.8, 
-                            heightwidthratio=0.3,
-                            ), theme_latexfonts())
+# theme_lc = merge(theme_web(width=1000,
+#                             colors=MakiePublication.tableau_10(),
+#                             linestyles=[nothing, :dash, :dash],
+#                             ishollowmarkers=[true, true, false],
+#                             markers=[:circle, :diamond, :rtriangle],
+#                             linecycle=Cycle([:color, :linestyle], covary=true),
+#                             scattercycle=Cycle([:color=>:markercolor, :strokecolor=>:color, :marker], covary=true),
+#                             markerstrokewidth=0.8, 
+#                             heightwidthratio=0.3,
+#                             ), theme_latexfonts())
 
 
-theme_hist = merge(theme_web(width=350, colors=MakiePublication.tableau_10(),linestyles=[nothing, :dash, :dash], ishollowmarkers=[true, true, false], markers=[:circle, :diamond, :rtriangle], linecycle=Cycle([:color, :linestyle], covary=true), scattercycle=Cycle([:color=>:markercolor, :strokecolor=>:color, :marker], covary=true), markerstrokewidth=0.8, heightwidthratio=0.9,), theme_latexfonts())
+# theme_hist = merge(theme_web(width=350, colors=MakiePublication.tableau_10(),linestyles=[nothing, :dash, :dash], ishollowmarkers=[true, true, false], markers=[:circle, :diamond, :rtriangle], linecycle=Cycle([:color, :linestyle], covary=true), scattercycle=Cycle([:color=>:markercolor, :strokecolor=>:color, :marker], covary=true), markerstrokewidth=0.8, heightwidthratio=0.9,), theme_latexfonts())
 
 # theme_llc = merge(theme_web(width=1000,
 #                             colors=MakiePublication.COLORS[5],
@@ -88,7 +88,7 @@ end
 
 
 
-function plotsf(binsf1::binned_result, binsf2::binned_result; fitsf1=[], fitsf2=[], proper_time=[])
+function plotsf(binsf1::binned_result, binsf2::binned_result; fitsf1=[], fitsf2=[], proper_time=[], save_fig_path::String="./fig/plot_sf.svg", save_fig::Bool=true)
     theme_sf = merge(theme_web(width=350, colors=MakiePublication.tableau_10(),linestyles=[nothing, :dash, :dash], ishollowmarkers=[true, true, false], markers=[:circle, :diamond, :rtriangle], linecycle=Cycle([:color, :linestyle], covary=true), scattercycle=Cycle([:color=>:markercolor, :strokecolor=>:color, :marker], covary=true), markerstrokewidth=0.8, heightwidthratio=0.9,), theme_latexfonts())
 
     fig_sf = with_theme(theme_sf) do 
@@ -101,6 +101,8 @@ function plotsf(binsf1::binned_result, binsf2::binned_result; fitsf1=[], fitsf2=
         yscale=log10, 
         xticks = LogTicks(IntegerTicks()),
         yticks = LogTicks(IntegerTicks()),
+        yminorticks=IntervalsBetween(9),
+        xminorticks=IntervalsBetween(9),
         xticksize=8,
         yticksize=8,
         xticksmirrored = true, yticksmirrored = true, 
@@ -125,7 +127,53 @@ function plotsf(binsf1::binned_result, binsf2::binned_result; fitsf1=[], fitsf2=
         fig
         # resize_to_layout!(fig)
     end
+    save_fig ? savefig(save_fig_path, fig_sf) : println(" ")
+    
     return fig_sf
+end
 
-    savefig("./fig/plot_sf.pdf", fig_sf)
+
+function plotcv(bincv::binned_result; mode="flux", proper_time=[],save_fig_path::String="./fig/plot_cv.svg", save_fig::Bool=true)
+
+    theme_cv = merge(theme_web(width=350, colors=MakiePublication.tableau_10(),linestyles=[nothing, :dash, :dash], ishollowmarkers=[true, true, false], markers=[:circle, :diamond, :rtriangle], linecycle=Cycle([:color, :linestyle], covary=true), scattercycle=Cycle([:color=>:markercolor, :strokecolor=>:color, :marker], covary=true), markerstrokewidth=0.8, heightwidthratio=0.9,), theme_latexfonts())
+
+    mode == "mag" && (ylabel = L"$C_m(\Delta t)$")
+    mode == "flux" && (ylabel = L"$C_f(\Delta t)$")
+
+    fig_cv = with_theme(theme_cv) do 
+        fig = Figure()  
+
+        ax = Axis(fig[1, 1],
+        xlabel=L"$\Delta t$ [sec]",
+        ylabel=ylabel,
+        xscale=log10, 
+        xticks = LogTicks(IntegerTicks()),
+        # yticks = 0.5:0.1:1.1,
+        yminorticks=IntervalsBetween(9),
+        xminorticks=IntervalsBetween(9),
+        xticksize=8,
+        yticksize=8,
+        xticksmirrored = true, yticksmirrored = true, 
+        )
+        
+        s = scatter!(ax, 10 .^ bincv.x, bincv.y)
+        
+
+        e = errorbars!(ax, 10 .^ bincv.x, bincv.y, bincv.yerr, bincv.yerr, linewidth=0.5, whiskerwidth = 0.2)
+        
+        isempty(proper_time) ? print(" ") : band!(ax, 10 ^ proper_time[1]:10 ^ proper_time[2], 0.5, 1.1, color= (:red, 0.1))
+        # hspan!(-1.1, -0.9, color = (:blue, 0.5))
+
+        ylims!(0.5, 1.1)
+        # ylims!(4e-3, 2e-1)
+        xlims!(80, 3e4)
+        
+        fig
+        # resize_to_layout!(fig)
+    end
+    
+    save_fig ? savefig(save_fig_path, fig_cv) : println(" ")
+    
+    return fig_cv
+    
 end
