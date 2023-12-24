@@ -53,13 +53,16 @@ you just need to modify the `path`, where the `Jirachi` is downloaded, and enjoy
 If this project makes you life easier, pls. cites this code as below:
 
 ```bib
-@misc{Jirachi.jl,
-	author  = {zhenbo su},
-	title   = {Jirachi.jl},
-	url     = {https://github.com/wssuzb/Jirachi.jl},
-	version = {v1.0.0-DEV},
-	year    = {2023},
-	month   = {12}
+@software{jirachi,
+  author       = {Su, Zhen-Bo},
+  title        = {{Julia project for analyzing variability in active 
+                   galaxies harboring massive black holes}},
+  month        = dec,
+  year         = 2023,
+  publisher    = {Zenodo},
+  version      = {v0.0.1},
+  doi          = {10.5281/zenodo.10428783},
+  url          = {https://doi.org/10.5281/zenodo.10428783}
 }
 ```
 
