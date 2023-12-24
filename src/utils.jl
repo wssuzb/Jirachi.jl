@@ -173,23 +173,6 @@ function lc_bootstrapped(data::lightcurve; seed=1, mode="both")
         data.band
     )
     
-    # if mode == "rss"
-    
-    #     return lightcurve(t_rss[idx_sort], y_rss[idx_sort], e_rss[idx_sort], data.band)
-    
-    # elseif mode == "both"
-    
-    #     return lightcurve(t_rss[idx_sort], y_fr_rss[idx_sort], e_rss[idx_sort], data.band)
-    
-    # else
-    #     return lightcurve(
-    #         data.time,
-    #         [rand(Normal(data.flux[i], data.err[i]), 1)[1] for i=1: lastindex(data.flux)],
-    #         data.err,
-    #         data.band
-    #     )
-    # end
-
 end
 
 # """
@@ -314,12 +297,14 @@ function get_common_lc(lc1::lightcurve, lc2::lightcurve)
     # find the index of values that are finite.
     idx = all(!isnan, hcat(lc1.flux, lc2.flux); dims=2) |> vec
     
-    lc1.time, lc1.flux, lc1.err = lc1.time[idx], lc1.flux[idx], lc1.err[idx]
-    lc2.time, lc2.flux, lc2.err = lc2.time[idx], lc2.flux[idx], lc2.err[idx]
+    return lightcurve(lc1.time[idx], lc1.flux[idx], lc1.err[idx], lc1.band), lightcurve(lc2.time[idx], lc2.flux[idx], lc2.err[idx], lc2.band)
+
+    # lc1.time, lc1.flux, lc1.err = lc1.time[idx], lc1.flux[idx], lc1.err[idx]
+    # lc2.time, lc2.flux, lc2.err = lc2.time[idx], lc2.flux[idx], lc2.err[idx]
     
     # lc1.time[t1_idx] ∩ lc2.time[t2_idx]
     # filter(row -> all(x -> !(x isa Number && isnan(x)), row), t_bin)
-    return lc1, lc2
+    # return lc1, lc2
 end
 
 # function get_common_lc(arr1::T, arr2::T) where{T}
@@ -337,15 +322,10 @@ function remove_lc_outlier(lc::lightcurve; cut=2, criteria="err")
     if criteria == "err"
         mean_err, std_err = mean(lc.err), std(lc.err)
         idx = @. abs(lc.err - mean_err) <= (cut * std_err)
-        lc.time = lc.time[idx]
-        lc.flux = lc.flux[idx]
-        lc.err = lc.err[idx]
     else
         mean_flux, std_flux = mean(lc.flux), std(lc.flux)
         idx = @. abs(lc.flux - mean_flux) <= (cut * std_flux)
-        lc.time = lc.time[idx]
-        lc.flux = lc.flux[idx]
-        lc.err = lc.err[idx]
     end
-    return lc
+    
+    return lightcurve(lc.time[idx], lc.flux[idx], lc.err[idx], lc.band)
 end
