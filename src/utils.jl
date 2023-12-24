@@ -49,12 +49,12 @@ lightcurve(time, flux, err) = lightcurve(time, flux, err, [])
 # ```jldoctest
 # julia> cv(tau, color)
 # ```
-"""
-    cv(tau, color)
+# """
+#     cv(tau, color)
 
-structure for loading color variation temp results.
+# structure for loading color variation temp results.
 
-"""
+# """
 struct cv
     tau::Vector{Float64}
     color::Vector{Float64}
@@ -64,12 +64,11 @@ end
 # ```jldoctest
 # julia> sf(tau, sf)
 # ```
-"""
-    sf(tau, sf)
+# """
+#     sf(tau, sf)
 
-structure for loading structure function results.
-
-"""
+# structure for loading structure function results.
+# """
 struct sf
     tau::Vector{Float64}
     sf::Vector{Float64}
@@ -109,11 +108,11 @@ binned_result(x, xerr, y, yerr) = binned_result(x, xerr, y, yerr, [])
 # ```jldoctest
 # julia> percentile_16_50_84([1, 2, 3])
 # ```
-"""
-    percentile_16_50_84(array)
+# """
+#     percentile_16_50_84(array)
 
-return 16%, 50% and 84% values with given array.
-"""
+# return 16%, 50% and 84% values with given array.
+# """
 function percentile_16_50_84(x::T) where {T}
     med = percentile(x, 50)
     low = med - percentile(x, 16)
@@ -202,44 +201,48 @@ end
 # load_data(fi_np::String; usecols=[1, 2, 3]) = load_data(fi_np, usecols)
 
 
-function save_data(arr1::Vector{Float64}, arr2::Vector{Float64}, arr3::Vector{Float64}; fi_np::String="./test_data/color_variability.txt")
-    res = []
-    for i=1: lastindex(arr1)
-        push!(res, [arr1[i], arr2[i], arr3[i]])
-    end
-
-    open(fi_np, "w") do io
-        writedlm(io, [map(x->x[1], res) map(x->x[2], res) map(x->x[3], res)], ' ')
-    end
-end
-
-function save_data(lc1::lightcurve, lc2::lightcurve; fi_np::String="./test_data/color_variability.txt")
-    res = []
-    for i=1: lastindex(lc1.time)
-        push!(res, [lc1.time[i], lc1.flux[i], lc1.err[i], lc2.time[i], lc2.flux[i], lc2.err[i]])
-    end
-
-    open(fi_np, "w") do io
-        writedlm(io, [map(x->x[1], res) map(x->x[2], res) map(x->x[3], res) map(x->x[4], res) map(x->x[5], res) map(x->x[6], res)], ' ')
-    end
-end
-# save_data(data::sf; fi_np::String="./test_data/color_variability.txt") = save_data(data.tau, data.sf; fi_np)
-# save_data(data::cv; fi_np::String="./test_data/color_variability.txt") = save_data(data.tau, data.color; fi_np)
-
-
-# function save_data(arr1::Vector{Float64}, arr2::Vector{Float64}, arr3::Vector{Float64}, arr4::Vector{Float64}; fi_np::String="./test_data/binned_color_variability.txt")
+# function save_data(arr1::Vector{Float64}, arr2::Vector{Float64}, arr3::Vector{Float64}; fi_np::String="./test_data/color_variability.txt")
 #     res = []
 #     for i=1: lastindex(arr1)
-#         push!(res, [arr1[i], arr2[i], arr3[i], arr4[i]])
+#         push!(res, [arr1[i], arr2[i], arr3[i]])
 #     end
 
 #     open(fi_np, "w") do io
-#         writedlm(io, [map(x->x[1], res) map(x->x[2], res) map(x->x[3], res) map(x->x[4], res)], ' ')
+#         writedlm(io, [map(x->x[1], res) map(x->x[2], res) map(x->x[3], res)], ' ')
 #     end
 # end
 
-# save_data(data::binned_result;  fi_np::String="./test_data/binned_color_variability.txt") = save_data(data.x, data.xerr, data.y, data.yerr; fi_np)
+# function save_data(lc1::lightcurve, lc2::lightcurve; fi_np::String="./test_data/color_variability.txt")
+#     res = []
+#     for i=1: lastindex(lc1.time)
+#         push!(res, [lc1.time[i], lc1.flux[i], lc1.err[i], lc2.time[i], lc2.flux[i], lc2.err[i]])
+#     end
 
+#     open(fi_np, "w") do io
+#         writedlm(io, [map(x->x[1], res) map(x->x[2], res) map(x->x[3], res) map(x->x[4], res) map(x->x[5], res) map(x->x[6], res)], ' ')
+#     end
+# end
+
+
+function hcatlc(lc::lightcurve)
+    T = typeof(lc)
+    names = fieldnames(T)
+    return reduce(hcat, (getfield(lc, names[i]) for i=1: length(names)-1)) 
+end
+
+
+function save_data(lc::lightcurve...; fi_np="./test.txt")
+    open(fi_np,"w") do io
+        writedlm(io, reduce(hcat, (hcatlc(l) for l in lc)))
+    end
+end
+# write(io, "# Light curves are saved as time, flux, err\n")
+
+function save_data(arr::Vector{Float64}...; fi_np="./test.txt")
+    open(fi_np,"w") do io
+        writedlm(io, hcat(arr...))
+    end
+end
 
 
 find_nearest(arr, val) = argmin(abs.(arr .- val))
