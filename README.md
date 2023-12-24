@@ -1,4 +1,5 @@
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://wssuzb.github.io/Jirachi.jl/dev/)
+[![DOI](https://zenodo.org/badge/730485481.svg)](https://zenodo.org/doi/10.5281/zenodo.10428782)
 
 # Jirachi - Julia project for analyzing variability in active galaxies harboring massive black holes
 
