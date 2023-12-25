@@ -1,4 +1,4 @@
-export par, lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time, bin_light_curve, get_common_lc, bin_lc_edges, remove_lc_outlier
+export lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time, bin_light_curve, get_common_lc, bin_lc_edges, remove_lc_outlier
 
 bin_lc_edges(binsize, t_start, t_end) = (t_start - (binsize / 2)):binsize:(t_end + (binsize / 2))
 
@@ -89,16 +89,6 @@ function lc_bootstrapped(data::lightcurve; seed=1, mode="both")
     )
     
 end
-
-
-function findmat(f, A::AbstractMatrix)
-    m,n = size(A)
-    out = []
-    for i in 1:m, j in 1:n
-      f(A[i,j]) && push!(out,(i,j))
-    end
-    return out
-end 
 
 
 """
