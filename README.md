@@ -1,7 +1,3 @@
-# Jirachi - Julia project for analyzing variability in active galaxies harboring massive black holes
-
-<img align="right" alt="jirachi" src="./test/fig/jirachi.jpeg" width="200" height="200"/>
-
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://wssuzb.github.io/Jirachi.jl/dev/)
 [![DOI](https://zenodo.org/badge/730485481.svg)](https://zenodo.org/doi/10.5281/zenodo.10428782)
 
@@ -9,6 +5,10 @@
 
 [![Build Status](https://github.com/wssuzb/Jirachi.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/wssuzb/Jirachi.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/wssuzb/Jirachi.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/wssuzb/Jirachi.jl)
+
+# Jirachi - Julia project for analyzing variability in active galaxies harboring massive black holes
+
+<img align="right" alt="jirachi" src="./test/fig/jirachi.jpeg" width="200" height="200"/>
 
 ## About this project
 
