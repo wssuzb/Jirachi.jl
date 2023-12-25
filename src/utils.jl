@@ -1,5 +1,33 @@
 export lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time, bin_light_curve, get_common_lc, bin_lc_edges, remove_lc_outlier
 
+
+@kwdef mutable struct parameters
+    # for light curve bins
+    t_start::Float64
+    t_end::Float64
+    t_binsize::Float64
+
+    # for structure function
+    sf_binsize::Float64
+    sf_start::Float64
+    sf_end::Float64
+
+    # for structure function fitting
+    mode::String # bootstrapped lc
+    nsim::Int64
+    lower_bounds::Vector{Any}
+    upper_bounds::Vector{Any}
+    p0::Vector{Any}
+
+    # for color variation
+    cv_binsize::Float64
+    cv_start::Float64
+    cv_end::Float64
+    nsigma::Int64
+    erroron::Bool
+end
+
+
 bin_lc_edges(binsize, t_start, t_end) = (t_start - (binsize / 2)):binsize:(t_end + (binsize / 2))
 
 """
