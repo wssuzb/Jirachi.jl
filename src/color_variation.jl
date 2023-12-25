@@ -17,7 +17,7 @@ calculate color variation, reference: Su et al., (2023)
 
 function color_variation(lc1::lightcurve, lc2::lightcurve, nsigma=3, erron=true, mode="mag"; showhist=false, err_method="sun2014")
 
-    isEqual(lc1, lc2) && t = lc1.time
+    isEqual(lc1, lc2) && (t = lc1.time)
     
     if mode == "mag"
         y1, err1 = flux2mag(lc1.flux, lc1.err)
