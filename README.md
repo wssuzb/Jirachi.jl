@@ -1,10 +1,9 @@
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://wssuzb.github.io/Jirachi.jl/dev/)
-[![DOI](https://zenodo.org/badge/730485481.svg)](https://zenodo.org/doi/10.5281/zenodo.10428782)
-
 # Jirachi - Julia project for analyzing variability in active galaxies harboring massive black holes
 
 <img align="right" alt="jirachi" src="./test/fig/jirachi.jpeg" width="200" height="200"/>
 
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://wssuzb.github.io/Jirachi.jl/dev/)
+[![DOI](https://zenodo.org/badge/730485481.svg)](https://zenodo.org/doi/10.5281/zenodo.10428782)
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://wssuzb.github.io/Jirachi.jl/stable/)
 
@@ -45,13 +44,6 @@ julia> push!(LOAD_PATH, "'~/where/you/download/the/package/Jirachi")
 julia> using Jirachi
 ```
 enjoy!
-
-<!-- ## -->
-
-<!-- - structure function
-
-
-<img align="center" alt="sf" src="./test/fig/plot_sf.svg" width="500" height="500"/> -->
 
 
 ## Citing
