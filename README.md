@@ -5,24 +5,30 @@
 
 <img align="right" alt="jirachi" src="./test/fig/jirachi.jpeg" width="200" height="200"/>
 
-<!-- - JIRACHI is a cute pokemon who always makes wishes come true !!! -->
 
-<!-- [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://wssuzb.github.io/Jirachi.jl/stable/) -->
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://wssuzb.github.io/Jirachi.jl/stable/)
 
-<!-- [![Build Status](https://github.com/wssuzb/Jirachi.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/wssuzb/Jirachi.jl/actions/workflows/CI.yml?query=branch%3Amain) -->
-<!-- [![Coverage](https://codecov.io/gh/wssuzb/Jirachi.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/wssuzb/Jirachi.jl) -->
+[![Build Status](https://github.com/wssuzb/Jirachi.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/wssuzb/Jirachi.jl/actions/workflows/CI.yml?query=branch%3Amain)
+[![Coverage](https://codecov.io/gh/wssuzb/Jirachi.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/wssuzb/Jirachi.jl)
 
 ## About this project
 
-Several functions can be found in this project to help us get better understand the central engine of AGNs:
+Several functions can be found in this project to help us get a better understand of the central engine of AGNs:
 
-- color variation
-- structure function
-- generate DRW
+- timescale-dependent color variation calculation.
+- structure function calculation and fits.
+- generate stochastic process light curves.
+- fractional variability.
+- ...
 
 A `PYTHON` version for calculating color variation can be found at [pyColorVariation.py](https://github.com/wssuzb/Jirachi.jl/blob/main/py/pyColorVariation.py).
 
 Read the [full documentation here.](https://wssuzb.github.io/Jirachi.jl/dev/)
+
+TODO:
+
+- [ ] reprocessing model
+- [ ] structure function calculation (see kozlowski+16)
 
 ## Install
 
@@ -35,10 +41,10 @@ julia> using Jirachi
 
 or alternatively, you can also download this `Jirachi.jl-main.zip` file, and load it by
 ```julia
-julia> push!(LOAD_PATH, path + "Jirachi.jl-main")
+julia> push!(LOAD_PATH, "'~/where/you/download/the/package/Jirachi")
 julia> using Jirachi
 ```
-you just need to modify the `path`, where the `Jirachi` is downloaded, and enjoy youself!
+enjoy!
 
 <!-- ## -->
 
