@@ -1,7 +1,20 @@
 export  runall
 
-function runall(lc1::lightcurve, lc2::lightcurve; sf_bin_edges=1:0.1:5, cv_bin_edges=1:0.2:5, nsigma=3, erron=true, nsim=10, fi_np::String="./run_all.h5", lower_bounds = [0, 0, 0, 0.001], upper_bounds = [10, 2e4, 2, 0.1], p0=[], mode="both", t_fit = 10 .^ range(log10(1), log10(6e4), step=0.1))
+function runall(
+    lc1::lightcurve, lc2::lightcurve, lc_edges::AbstractArray; 
+    tunits = 24 * 3600,
+    sf_bin_edges=1:0.1:5, cv_bin_edges=1:0.2:5, nsigma=3, erron=true, nsim=10, fi_np::String="./run_all.h5", lower_bounds = [0, 0, 0, 0.001], upper_bounds = [10, 2e4, 2, 0.1], p0=[], mode="both", t_fit = 10 .^ range(log10(1), log10(6e4), step=0.1)
+    )
+    
+    lc1.time = lc1.time .- lc1.time[1]
+    lc1.time = round.(lc1.time * tunits, digits=2)
 
+    println(lc1)
+
+    lc2.time = lc2.time .- lc2.time[1]
+    lc2.time = round.(lc2.time * tunits, digits=2)
+
+    println(lc2)
 
     fit_sf1 = fitsf_mcmc(lc1; nsim=nsim, lb = lower_bounds , ub = upper_bounds, sf_bin_edges=sf_bin_edges, p0=p0, mode = mode)
     fit_sf2 = fitsf_mcmc(lc2; nsim=nsim, lb = lower_bounds, ub = upper_bounds, sf_bin_edges=sf_bin_edges, p0=p0, mode = mode)
@@ -27,11 +40,20 @@ function runall(lc1::lightcurve, lc2::lightcurve; sf_bin_edges=1:0.1:5, cv_bin_e
     t_used_min = maximum([t_min_1, t_min_2])
     t_used_max = minimum([t_break_1, t_break_2])
 
+
+    lc1_bin = bin_light_curve(lc1; lc_edges = lc_edges)
+    lc2_bin = bin_light_curve(lc2; lc_edges = lc_edges)
+    
+    lc1_bin, lc2_bin = get_common_lc(lc1_bin, lc2_bin)
+
+    # save_data(lc1_bin, lc2_bin; fi_np = "./data/bin_lightcurve/lc_bin_" * string(t_cad) * "_montano22_n1_nsim_" * string(nsim) * "_mode_" * string(mode) *  "_nsigma_" * string(nsigma) * "_band_" * lc1.band * "_" * lc2.band * ".txt")
+
+
     nsigma = nsigma
     erron = erron
     
     # cv in flux-Flux
-    cv_flux_res = color_variation(lc1, lc2, nsigma, erron, "flux"; showhist=true)
+    cv_flux_res = color_variation(lc1_bin, lc2_bin, nsigma, erron, "flux"; showhist=true)
     
     cv_flux = cv_flux_res.cv
 
@@ -42,7 +64,7 @@ function runall(lc1::lightcurve, lc2::lightcurve; sf_bin_edges=1:0.1:5, cv_bin_e
     bincv_flux = binned_color_variation(cv_flux, cv_bin_edges)
 
     # cv in mag-mag
-    cv_mag_res = color_variation(lc1, lc2, nsigma, erron, "mag")
+    cv_mag_res = color_variation(lc1_bin, lc2_bin, nsigma, erron, "mag")
     cv_mag = cv_mag_res
 
     bincv_mag = binned_color_variation(cv_mag, cv_bin_edges)
