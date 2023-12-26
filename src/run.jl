@@ -54,7 +54,7 @@ function runall(
     par_1, par_1_err = fit_sf1.param, fit_sf1.param_err
     par_2, par_2_err = fit_sf2.param, fit_sf2.param_err
 
-    # chisq1, chisq2 = fit_sf1.chisquare, fit_sf2.chisquare
+    chisq1, chisq2 = fit_sf1.chisquare, fit_sf2.chisquare
 
     t_break_1 = find_t_break(binsf1)
     t_break_2 = find_t_break(binsf2)
@@ -134,7 +134,7 @@ function runall(
         file["fit"] = _fit
         file["par"] = _par
         
-        # file["fit_chisqure"] = [chisq1, chisq]
+        file["fit_chisqure"] = [chisq1, chisq2]
 
         file["sf_min"] = [sf_min_1, sf_min_2]
         file["t_min"] = [t_min_1, t_min_2]
