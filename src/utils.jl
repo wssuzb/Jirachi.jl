@@ -1,4 +1,4 @@
-export lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time, bin_light_curve, get_common_lc, bin_lc_edges, remove_lc_outlier
+export lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time, bin_light_curve, get_common_lc, bin_lc_edges, remove_lc_outlier, remove_lc_nan
 
 
 @kwdef mutable struct parameters
@@ -29,6 +29,8 @@ end
 
 
 bin_lc_edges(binsize, t_start, t_end) = (t_start - (binsize / 2)):binsize:(t_end + (binsize / 2))
+
+# range(start=0, stop=1, step=2)
 
 """
     lightcurve(time, flux, err)
@@ -196,17 +198,34 @@ function bin_light_curve(lc::lightcurve; lc_edges::AbstractArray)
 
     flux_bin = bin(mean, lc_edges, lc.time, lc.flux)
     err_bin = bin(lc_bin_err, lc_edges, lc.time, lc.err)
+    
     return lightcurve(bin_center, flux_bin, err_bin, lc.band)
 end
 
-
-function get_common_lc(lc1::lightcurve, lc2::lightcurve)
-    # find the index of values that are finite.
-    idx = all(!isnan, hcat(lc1.flux, lc2.flux); dims=2) |> vec
-    
-    return lightcurve(lc1.time[idx], lc1.flux[idx], lc1.err[idx], lc1.band), lightcurve(lc2.time[idx], lc2.flux[idx], lc2.err[idx], lc2.band)
+function remove_lc_nan(lc::lightcurve)
+    idx = all(!isnan, lc.flux; dims=2) |> vec
+    return lightcurve(lc.time[idx], lc.flux[idx], lc.err[idx], lc.band)
 end
 
+
+# function get_common_lc(lc1::lightcurve, lc2::lightcurve)
+#     # find the index of values that are finite.
+#     idx = all(!isnan, hcat(lc1.flux, lc2.flux); dims=2) |> vec
+    
+#     return lightcurve(lc1.time[idx], lc1.flux[idx], lc1.err[idx], lc1.band), lightcurve(lc2.time[idx], lc2.flux[idx], lc2.err[idx], lc2.band)
+# end
+
+
+function get_common_lc(lc1::lightcurve, lc2::lightcurve)
+    # find the common values of two given array: arr1, arr2
+    common_t = intersect(lc1.time, lc2.time)
+   
+    # find the index of the common values in: arr1, arr2, respectively.
+    ind1 = indexin(common_t, lc1.time)
+    ind2 = indexin(common_t, lc2.time)
+
+    return lightcurve(lc1.time[ind1], lc1.flux[ind1], lc1.err[ind1], lc1.band), lightcurve(lc2.time[ind2], lc2.flux[ind2], lc2.err[ind2], lc2.band)
+end
 
 function remove_lc_outlier(lc::lightcurve; cut=2, criteria="err")
     if criteria == "err"

@@ -4,7 +4,7 @@ export color_variation, binned_color_variation, flux2mag
 isEqual(lc1::lightcurve, lc2::lightcurve) = diff(lc1.time) == diff(lc2.time) ? println(" ") : error("The Light curves should be quasi-simultaneou observed!!!")
 
 function flux2mag(flux, err)
-    mag = -2.5 * log10.(flux)
+    mag = @. -2.5 * log10(flux) - 21.175
     mag_err = @. 2.5 / log(10) * (err / flux) # approximately!!!
     return mag, mag_err
 end

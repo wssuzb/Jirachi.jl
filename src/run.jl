@@ -1,23 +1,53 @@
 export  runall
 
+"""
+runall(
+    lc1::lightcurve, lc2::lightcurve, lc_edges::AbstractArray; 
+    tunits = 24 * 3600, 
+    label::String,
+    sf_bin_edges=1:0.1:5, 
+    cv_bin_edges=1:0.2:5, 
+    nsigma=3, 
+    erron=true, 
+    nsim=10, 
+    fi_np::String="./run_all.h5", 
+    lower_bounds = [0, 0, 0, 0.001], 
+    upper_bounds = [10, 2e4, 2, 0.1], 
+    p0=[], 
+    mode="both", 
+    t_fit = 10 .^ range(log10(1), log10(6e4), step=0.1)
+    )
+
+
+    The pipeline for run all results.
+"""
 function runall(
     lc1::lightcurve, lc2::lightcurve, lc_edges::AbstractArray; 
-    tunits = 24 * 3600,
+    tunits = 24 * 3600, label::String,
     sf_bin_edges=1:0.1:5, cv_bin_edges=1:0.2:5, nsigma=3, erron=true, nsim=10, fi_np::String="./run_all.h5", lower_bounds = [0, 0, 0, 0.001], upper_bounds = [10, 2e4, 2, 0.1], p0=[], mode="both", t_fit = 10 .^ range(log10(1), log10(6e4), step=0.1)
     )
     
     lc1.time = lc1.time .- lc1.time[1]
     lc1.time = round.(lc1.time * tunits, digits=2)
 
-    println(lc1)
-
     lc2.time = lc2.time .- lc2.time[1]
     lc2.time = round.(lc2.time * tunits, digits=2)
 
-    println(lc2)
+    lc1_bin_nan = bin_light_curve(lc1; lc_edges = lc_edges)
+    
+    lc2_bin_nan = bin_light_curve(lc2; lc_edges = lc_edges)
 
-    fit_sf1 = fitsf_mcmc(lc1; nsim=nsim, lb = lower_bounds , ub = upper_bounds, sf_bin_edges=sf_bin_edges, p0=p0, mode = mode)
-    fit_sf2 = fitsf_mcmc(lc2; nsim=nsim, lb = lower_bounds, ub = upper_bounds, sf_bin_edges=sf_bin_edges, p0=p0, mode = mode)
+    lc1_bin = remove_lc_nan(lc1_bin_nan)
+    lc2_bin = remove_lc_nan(lc2_bin_nan)
+
+    flux_ratio = mean(lc1_bin.flux) / mean(lc2_bin.flux)
+
+    println(lc1_bin)
+
+    println(lc2_bin)
+
+    fit_sf1 = fitsf_mcmc(lc1_bin; nsim=nsim, lb = lower_bounds , ub = upper_bounds, sf_bin_edges=sf_bin_edges, p0=p0, mode = mode)
+    fit_sf2 = fitsf_mcmc(lc2_bin; nsim=nsim, lb = lower_bounds, ub = upper_bounds, sf_bin_edges=sf_bin_edges, p0=p0, mode = mode)
     
     binsf1, binsf2 = fit_sf1.binsf, fit_sf2.binsf
     
@@ -41,19 +71,16 @@ function runall(
     t_used_max = minimum([t_break_1, t_break_2])
 
 
-    lc1_bin = bin_light_curve(lc1; lc_edges = lc_edges)
-    lc2_bin = bin_light_curve(lc2; lc_edges = lc_edges)
-    
-    lc1_bin, lc2_bin = get_common_lc(lc1_bin, lc2_bin)
+    lc1_bin_com, lc2_bin_com = get_common_lc(lc1_bin, lc2_bin)
 
-    # save_data(lc1_bin, lc2_bin; fi_np = "./data/bin_lightcurve/lc_bin_" * string(t_cad) * "_montano22_n1_nsim_" * string(nsim) * "_mode_" * string(mode) *  "_nsigma_" * string(nsigma) * "_band_" * lc1.band * "_" * lc2.band * ".txt")
+    save_data(lc1_bin_com, lc2_bin_com; fi_np = "./data/bin_lightcurve/lc_bin_" * string(step(lc_edges)) * "_" * label * "_nsim_" * string(nsim) * "_mode_" * string(mode) *  "_nsigma_" * string(nsigma) * "_band_" * lc1.band * "_" * lc2.band * ".txt")
 
 
     nsigma = nsigma
     erron = erron
     
     # cv in flux-Flux
-    cv_flux_res = color_variation(lc1_bin, lc2_bin, nsigma, erron, "flux"; showhist=true)
+    cv_flux_res = color_variation(lc1_bin_com, lc2_bin_com, nsigma, erron, "flux"; showhist=true)
     
     cv_flux = cv_flux_res.cv
 
@@ -64,7 +91,7 @@ function runall(
     bincv_flux = binned_color_variation(cv_flux, cv_bin_edges)
 
     # cv in mag-mag
-    cv_mag_res = color_variation(lc1_bin, lc2_bin, nsigma, erron, "mag")
+    cv_mag_res = color_variation(lc1_bin_com, lc2_bin_com, nsigma, erron, "mag")
     cv_mag = cv_mag_res
 
     bincv_mag = binned_color_variation(cv_mag, cv_bin_edges)
@@ -87,7 +114,7 @@ function runall(
     _par[:, :, 2] = [par_2[1] par_2_err[1] par_2[2] par_2_err[2] par_2[3] par_2_err[3] par_2[4] par_2_err[4]]
 
     band_pair = [lc1.band lc2.band]
-    flux_ratio = lc1.flux ./ lc2.flux
+    
 
     # _fit_mcmc_t = zeros(nsim, length(sf_bin_edges)-1, 2)
     # _fit_mcmc_t[:,:,1] = fit_sf1.t
