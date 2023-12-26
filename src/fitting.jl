@@ -140,12 +140,14 @@ function fitsf_mcmc(data::lightcurve; nsim=1000, lb = [0, 0, 0, 0.001], ub = [10
     @printf "SF: %.2f +/- %.2f" p[1]/1e-2  p_std_err[1]/1e-2
 
     println(" ")
-    println(" ")
     
+    
+    r = @. sf_new[idx_tmax] - jmodel(10 .^ t_new[idx_tmax], p)
+    chisq = @. sum((r / err_new[idx_tmax]) ^ 2)
 
-    #TODO
-    #Chi-square r = ydata - jmodel(xdata, param), chisq = @. sum((r / sigma) ^ 2).
+    @printf "chi-square: %.2f " chisq
 
-    return (binsf = binsf, param = p, param_err = p_std_err)
+    return (binsf = binsf, param = p, param_err = p_std_err, chisquare = chisq)
 
 end
+
