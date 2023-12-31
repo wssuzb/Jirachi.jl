@@ -15,7 +15,7 @@ runall(
     upper_bounds = [10, 2e4, 2, 0.1], 
     p0=[], 
     mode="both", 
-    t_fit = 10 .^ range(log10(1), log10(6e4), step=0.1)
+    t_fit = 10 .^ range(log10(1), log10(6e4), step=0.1, sf_noise_sigma=2)
     )
 
 
@@ -24,7 +24,7 @@ runall(
 function runall(
     lc1::lightcurve, lc2::lightcurve, lc_edges::AbstractArray; 
     tunits = 24 * 3600, label::String,
-    sf_bin_edges=1:0.1:5, cv_bin_edges=1:0.2:5, nsigma=3, erron=true, nsim=10, fi_np::String="./run_all.h5", lower_bounds = [0, 0, 0, 0.001], upper_bounds = [10, 2e4, 2, 0.1], p0=[], mode="both", t_fit = 10 .^ range(log10(1), log10(6e4), step=0.1)
+    sf_bin_edges=1:0.1:5, cv_bin_edges=1:0.2:5, nsigma=3, erron=true, nsim=10, fi_np::String="./run_all.h5", lower_bounds = [0, 0, 0, 0.001], upper_bounds = [10, 2e4, 2, 0.1], p0=[], mode="both", t_fit = 10 .^ range(log10(1), log10(6e4), step=0.1), sf_noise_sigma=2
     )
     
     lc1.time = lc1.time .- lc1.time[1]
@@ -59,8 +59,8 @@ function runall(
     t_break_1 = find_t_break(binsf1)
     t_break_2 = find_t_break(binsf2)
     
-    itp1 = find_t_min(binsf1, par_1; t_fit=t_fit)
-    itp2 = find_t_min(binsf2, par_2; t_fit=t_fit)
+    itp1 = find_t_min(binsf1, par_1; sf_noise_sigma=sf_noise_sigma, t_fit=t_fit)
+    itp2 = find_t_min(binsf2, par_2; sf_noise_sigma=sf_noise_sigma, t_fit=t_fit)
 
     t_min_1, sf_min_1 = itp1.t_min, itp1.sf_min
     t_min_2, sf_min_2 = itp2.t_min, itp2.sf_min
@@ -74,7 +74,7 @@ function runall(
 
     lc1_bin_com, lc2_bin_com = get_common_lc(lc1_bin, lc2_bin)
 
-    save_data(lc1_bin_com, lc2_bin_com; fi_np = "./data/bin_lightcurve/lc_bin_" * string(step(lc_edges)) * "_" * label * "_nsim_" * string(nsim) * "_mode_" * string(mode) *  "_nsigma_" * string(nsigma) * "_band_" * lc1.band * "_" * lc2.band * ".txt")
+    # save_data(lc1_bin_com, lc2_bin_com; fi_np = "./data/bin_lightcurve/lc_bin_" * string(step(lc_edges)) * "_" * label * "_nsim_" * string(nsim) * "_mode_" * string(mode) *  "_nsigma_" * string(nsigma) * "_band_" * lc1.band * "_" * lc2.band * ".txt")
 
 
     nsigma = nsigma
