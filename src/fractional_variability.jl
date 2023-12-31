@@ -5,12 +5,11 @@ function fractional_variability(flux, err)
     reference: Vaughan+2003.
     """
     N = length(flux)
+    x̄ = mean(flux)
     
-    S² = 1 / (N-1) * sum((flux .- mean(flux)) .^ 2)
+    S² = 1 / (N-1) * sum((flux .- x̄) .^ 2)
     err² = sum(err .^ 2) / N
     
-    x̄ = mean(flux)
-
     println("S²: ", S²)
     println("err²: ", err²)
 
