@@ -32,9 +32,8 @@ function fractional_variability(flux, err)
     
 
     σ²_rms = σ_xs2
-    # err_σ²_rms = sqrt(2 / N) * (sum(err .^ 2) / N)
-    err_σ²_rms = sqrt((sqrt(2 / N) * err² ) ^ 2 + (sqrt( err² / N ) * 2 * fvar * x̄ ) ^ 2) 
 
+    err_σ²_rms =  (S² / err² >= 100) ? err_σ²_rms = sqrt((sqrt(2 / N) * err² ) ^ 2 + (sqrt( err² / N ) * 2 * fvar * x̄ ) ^ 2) : sqrt(2 / N) * (sum(err .^ 2) / N)
 
     return fvar, err_fvar, σ_nxs2, err_nxs2, σ²_rms, err_σ²_rms
 end
