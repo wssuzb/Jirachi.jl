@@ -124,7 +124,7 @@ function fitsf_mcmc(data::lightcurve; nsim=1000, lb = [0, 0, 0, 0.001], ub = [10
     println(p0_bounds)
     println(" ")
 
-    wt = 1  ./ err_new[idx_tmax] .^ 2
+    wt = 1  ./ (err_new[idx_tmax] .^ 2)
     fit_bounds = curve_fit(jmodel, 10 .^ t_new[idx_tmax], sf_new[idx_tmax], wt, p0_bounds, lower=lb, upper=ub)
     
     p = fit_bounds.param

@@ -100,10 +100,12 @@ function lc_bootstrapped(data::lightcurve; seed=1, mode="both")
     unique_array = uniquecount(idx)
     idx_unique, counts = unique_array.keys, unique_array.vals
     
+    # random subset selection
     t_rss = data.time[idx_unique]
     y_rss = data.flux[idx_unique]
     e_rss = @. data.err[idx_unique] / sqrt(counts)
 
+    # add random flux
     y_fr_rss = [rand(Normal(y_rss[i], e_rss[i]), 1)[1] for i=1: lastindex(y_rss)]
     idx_sort = sortperm(t_rss)
 
