@@ -1,5 +1,3 @@
-#!/bin/python
-
 import numpy as np
 from scipy.stats import binned_statistic
 from scipy.signal import find_peaks
@@ -14,7 +12,18 @@ binned_data_cv = namedtuple('bin', ('x', 'xerr', 'y', 'yerr', 'num_all', 'num_cu
 fit_result = namedtuple('fit', ('t_max', 'sf_max', 't_min', 'sf_min', 't_fit', 'sf_fit', 'par', 'par_err'))
 
 def bin_lightcurve(lc, used_bins):
+    """
+    binning the light curves
+
+    Inputs:
+
+        lc -- input lightcurves, should be in type of namedtuple-like
+        used_bins -- the bins for binning lightcurve
     
+    Outputs:
+
+        lightcurve(bin_dt_center[~idx], bin_flux[~idx], bin_err[~idx]) -- the resultant lightcurves after binning
+    """
     if not isinstance(lc, lightcurve):
         print("light curves should be input with namedtuple-like type!!!")
         
@@ -31,13 +40,35 @@ def bin_lightcurve(lc, used_bins):
 
 
 def get_common_lc(lc1, lc2):
-    
+    """
+    calculating color variation requires quasi-simultaneou observations, thus this function help get the overlap observed time bewteen 2 lightcurves.
+
+    Inputs: 
+        lc1 -- first lightcurve
+        lc2 -- second lightcurve
+
+    Outputs:
+        lc1 -- new first lightcurve
+        lc2 -- new first lightcurve
+    """
+
+
     common_t = np.intersect1d(lc1.time, lc2.time, return_indices=True)
     
     return lightcurve(lc1.time[common_t[1]], lc1.flux[common_t[1]], lc1.err[common_t[1]]), lightcurve(lc2.time[common_t[2]], lc2.flux[common_t[2]], lc2.err[common_t[2]])
 
 def lc_mcmc(lc, mode='both'):
-        
+    """
+    fr/rss methods, flux randomness and random subset selection for lightcurves.
+    reference: Fausnaugh+16
+
+    Inputs: 
+        lc -- lightcurve
+        mode -- "both": fr/rss; "fr": fr only; "rss": rss only.
+    
+    Outputs: lc -- lightcurve after sampling
+    """    
+    
     if not isinstance(lc, lightcurve):
         print("light curves should be input with namedtuple-like type!!!")
 
@@ -60,7 +91,18 @@ def lc_mcmc(lc, mode='both'):
         return lightcurve(lc.time, np.random.normal(lc.flux, lc.err), lc.err)
 
 def structure_function(lc, used_bins):
+    """
+    calculate the structure function without removing photometric uncertainties.
+
+    reference: kozlowski+16
     
+    Inputs: 
+        lc -- lightcurve
+        used_bins -- used for bin structure function    
+
+    Outputs: the binned structure function
+    """
+
     if not isinstance(lc, lightcurve):
         print("light curves should be input with namedtuple-like type!!!")
     
@@ -90,8 +132,13 @@ def structure_function(lc, used_bins):
 
     return binned_data(bin_dt_center, bin_dt_width, bin_sf, bin_sf_err)
 
-def structure_function_mcmc(lc,  used_bins, mode='both', nsim=200):
-    
+def structure_function_mcmc(lc,  used_bins, mode='both', nsim=1000):
+    """
+    same as `structure_function`, but use the fr/rss to sampling the lightcurves.
+
+    """
+
+
     if not isinstance(lc, lightcurve):
         print("light curves should be input with namedtuple-like type!!!")
     
@@ -111,6 +158,8 @@ def structure_function_mcmc(lc,  used_bins, mode='both', nsim=200):
     
     idx = np.isnan(mysf.y)
     
+    # Updating the structure function errors!
+
     return binned_data(mysf.x[~idx], mysf.xerr[~idx], mysf.y[~idx], sf_err_mcmc.flatten()[~idx])
 
 
@@ -118,6 +167,11 @@ def fit_sf(t, sf_inf, tau, beta, sigma):
     return np.sqrt(sf_inf ** 2 * (1-np.exp(-(t / tau) ** beta)) + 2 * sigma ** 2)
 
 def find_t_max(binsf, prominence=1e-3, width=1e-3, check_plot=False):
+    """
+    find the local maximum structure function, and you can check if the maximum time is the proper one by set `check_plot=True`.
+
+    for more details, see: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html
+    """
     peaks, properties = find_peaks(binsf.y, prominence=prominence, width=width)
 
     if check_plot:
@@ -136,6 +190,11 @@ def find_t_max(binsf, prominence=1e-3, width=1e-3, check_plot=False):
 
 def find_proper_time(binsf, prominence=1e-3, width=1e-3,  sf_noise_sigma = 2, p0 = [1, 1e3, 1, 0.005],lower_bounds = [], upper_bounds = [],  t_fit = 10 ** np.arange(0, 5.1, 0.1)):
     
+    """
+    
+    find the proper time range of a given SF, see Su+24 for more details.
+
+    """
     peaks, properties = find_peaks(binsf.y, prominence=prominence, width=width)
 
     t_max, sf_max = binsf.x[peaks][0], binsf.y[peaks][0]
@@ -176,6 +235,12 @@ def flux2mag(flux, err):
 
 def color_variation(lc1, lc2, erron, nsigma, used_bins, mode='flux', showhist=False):
     
+    """
+    
+    calculte the timescale-dependent color variation, see Su+24 for more details.
+
+    """
+
     if not (isinstance(lc1, lightcurve) & isinstance(lc2, lightcurve)):
         print("light curves should be input with namedtuple-like type!!!")
     
