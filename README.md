@@ -18,12 +18,14 @@ Several functions can be found in this project to help us get a better understan
 - fractional variability.
 - ...
 
+A `JULIA` version for calculating color variation can be found at [run_demo.jl](https://github.com/wssuzb/Jirachi.jl/blob/main/jl/run_demo.jl). Read the [full documentation here.](https://wssuzb.github.io/Jirachi.jl/dev/)
+
 A `PYTHON` version for calculating color variation can be found at [run_demo.py](https://github.com/wssuzb/Jirachi.jl/blob/main/py/run_demo.py).
+
+Run & plot it!
 
 <img align="center" alt="jirachi" src="./py/mag_flux_new_sun14_i_z.png" width="700" height="600"/>
 
-
-Read the [full documentation here.](https://wssuzb.github.io/Jirachi.jl/dev/)
 
 TODO:
 
