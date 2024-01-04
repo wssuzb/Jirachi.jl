@@ -7,4 +7,5 @@
 */.DS_Store
 .DS_Store
 .vscode
-./py/__pycache__/
+__pycache__/
+*.pyc
