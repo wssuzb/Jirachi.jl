@@ -67,8 +67,8 @@ cv_bin = 10 ** np.arange(0, 5.1, 0.1) # to bin the color variation
 # Loading data
 # --------------------------------------------------------------------------->
 
-lc1_dat = np.loadtxt("../test/ngc4395/Montano22_night1/%s_4395.txt"%str(used_band[0]), usecols=[0, 1, 2])
-lc2_dat = np.loadtxt("../test/ngc4395/Montano22_night1/%s_4395.txt"%str(used_band[1]), usecols=[0, 1, 2])
+lc1_dat = np.loadtxt("../test/ngc4395/Montano22_n1/%s_4395.txt"%str(used_band[0]), usecols=[0, 1, 2])
+lc2_dat = np.loadtxt("../test/ngc4395/Montano22_n1/%s_4395.txt"%str(used_band[1]), usecols=[0, 1, 2])
 
 t1, y1, e1 = lc1_dat[:, 0], lc1_dat[:, 1], lc1_dat[:, 2]
 t1 = (t1 - t1[0]) * 24 * 3600 - 1e-9 # for some reasons, we shift the time by 1e-9 to match the results from `julia` version, and it do not influence our final analysis.
@@ -226,7 +226,7 @@ axes['B'].errorbar(cv_1_t[idx_cv_1], cv_1_y[idx_cv_1],
                    xerr= np.vstack((cv_1_t_err[idx_cv_1], cv_1_t_err[idx_cv_1])), 
                    yerr=np.vstack((cv_1_y_err[idx_cv_1], cv_1_y_err[idx_cv_1])), color='black',
                    mew=0.2, elinewidth=0.2, lw=0.3,ls='-', capsize=0.5)#, label='%s vs. %s'%(band_pair[0], band_pair[1]), color='black', ecolor='black', zorder=2)
-axes['B'].axhline(y=1 / flux_ratio[0], xmin=0, xmax=1e4, color='gray', ls='--', zorder=0, lw=0.5) # ewidth
+axes['B'].axhline(y=1 / flux_ratio, xmin=0, xmax=1e4, color='gray', ls='--', zorder=0, lw=0.5) # ewidth
 axes['B'].set_ylabel(r'$C_f(\tau)$', fontsize=10)
 axes['B'].set_yticks(np.arange(0.30, 1.5, 0.1), major=True)
 axes['B'].set_yticks(np.arange(0.30, 1.52, 0.02), minor=True)

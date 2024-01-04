@@ -208,6 +208,12 @@ def find_proper_time(binsf, prominence=1e-3, width=1e-3,  sf_noise_sigma = 2, p0
     
     par, par_err = popt, np.sqrt(np.diag(pcov))
     
+    print("lc best-fit:", "\n")
+    print("\t SF: %.4f +/- %.4f"%(par[0], par_err[0]), "\n")
+    print("\t tau: %.4f +/- %.4f"%(par[1], par_err[1]), "\n")
+    print("\t beta: %.4f +/- %.4f"%(par[2], par_err[2]), "\n")
+    print("\t sigma: %.4f +/- %.4f"%(par[3], par_err[3]), "\n")
+
     sf_fit = fit_sf(t_fit, *popt)
 
     noise_cut = sf_noise_sigma * np.sqrt(2) * popt[-1] 
