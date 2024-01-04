@@ -18,7 +18,7 @@ Several functions can be found in this project to help us get a better understan
 - fractional variability.
 - ...
 
-A `PYTHON` version for calculating color variation can be found at [pyColorVariation.py](https://github.com/wssuzb/Jirachi.jl/blob/main/py/pyColorVariation.py).
+A `PYTHON` version for calculating color variation can be found at [run_demo.py](https://github.com/wssuzb/Jirachi.jl/blob/main/py/run_demo.py).
 
 Read the [full documentation here.](https://wssuzb.github.io/Jirachi.jl/dev/)
 

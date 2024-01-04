@@ -151,12 +151,6 @@ cv_2_y_err = cv_mag.yerr
 
 idx_cv_2 = np.where((cv_2_t>=t_used_min) & (cv_2_t<=t_used_max), True, False)
 
-# cv_use_bin= 10 ** np.arange(0., 5.1, 0.1)
-# bin_width_all = [(cv_use_bin[i+1] - cv_use_bin[i]) / 2 for i in range(len(cv_use_bin)- 1)]
-# xerr_all = np.vstack((bin_width_all, bin_width_all))
-# bin_width_all = np.array(bin_width_all)
-# bin_centers_all = cv_use_bin[1:] - bin_width_all
-
 # -------------------------------------------------------------->
 # For plotting 
 # -------------------------------------------------------------->
