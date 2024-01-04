@@ -20,7 +20,7 @@ Several functions can be found in this project to help us get a better understan
 
 A `PYTHON` version for calculating color variation can be found at [run_demo.py](https://github.com/wssuzb/Jirachi.jl/blob/main/py/run_demo.py).
 
-<img align="center" alt="jirachi" src="./py/mag_flux_new_sun14_i_z.png" width="300" height="300"/>
+<img align="center" alt="jirachi" src="./py/mag_flux_new_sun14_i_z.png" width="700" height="700"/>
 
 
 Read the [full documentation here.](https://wssuzb.github.io/Jirachi.jl/dev/)
