@@ -50,7 +50,8 @@ for i in range(len(band)):
            band_pair.append([band[i], band[j]])
        
 
-used_band = [sys.argv[1], sys.argv[2]]
+# used_band = [sys.argv[1], sys.argv[2]]
+used_band = ['i', 'z']
 
 band1, band2 = used_band[0], used_band[1]
 
