@@ -223,8 +223,10 @@ axes['B'].errorbar(cv_1_t[idx_cv_1], cv_1_y[idx_cv_1],
                    mew=0.2, elinewidth=0.2, lw=0.3,ls='-', capsize=0.5)#, label='%s vs. %s'%(band_pair[0], band_pair[1]), color='black', ecolor='black', zorder=2)
 axes['B'].axhline(y=1 / flux_ratio, xmin=0, xmax=1e4, color='gray', ls='--', zorder=0, lw=0.5) # ewidth
 axes['B'].set_ylabel(r'$C_f(\tau)$', fontsize=10)
-axes['B'].set_yticks(np.arange(0.30, 1.5, 0.1), major=True)
-axes['B'].set_yticks(np.arange(0.30, 1.52, 0.02), minor=True)
+# axes['B'].set_yticks(np.arange(0.30, 1.5, 0.1), major=True)
+# axes['B'].set_yticks(np.arange(0.30, 1.52, 0.02), minor=True)
+axes['B'].yaxis.set_major_locator(ticker.MultipleLocator(0.1))
+axes['B'].yaxis.set_minor_locator(ticker.MultipleLocator(0.02))
 axes['B'].set_ylim(0.5, 1.1)
 axes['B'].text(0.05, 0.05, 'BWB', transform=axes['B'].transAxes, color='blue', fontsize=7)
 axes['B'].text(0.05, 0.9, 'RWB', transform=axes['B'].transAxes, color='red', fontsize=7)
@@ -264,9 +266,10 @@ axes['D'].errorbar(cv_2_t[idx_cv_2], cv_2_y[idx_cv_2],
 
 axes['D'].text(0.05, 0.05, 'BWB', transform=axes['D'].transAxes, color='blue', fontsize=7)
 axes['D'].text(0.05, 0.9, 'RWB', transform=axes['D'].transAxes, color='red', fontsize=7)
-
-axes['D'].set_yticks(np.arange(0.5, 1.5, 0.1), major=True)
-axes['D'].set_yticks(np.arange(0.5, 1.5, 0.02), minor=True)
+axes['D'].yaxis.set_major_locator(ticker.MultipleLocator(0.1))
+axes['D'].yaxis.set_minor_locator(ticker.MultipleLocator(0.02))
+# axes['D'].set_yticks(np.arange(0.5, 1.5, 0.1), major=True)
+# axes['D'].set_yticks(np.arange(0.5, 1.5, 0.02), minor=True)
 axes['D'].set_ylim(0.7,1.3)
 axes['D'].set_ylabel(r'$C_m(\tau)$', fontsize=10)
 
@@ -292,4 +295,5 @@ axes['D'].fill_between(np.arange(t_used_min, t_used_max, 0.1), 0, 2,
            
 plt.tight_layout()
 plt.subplots_adjust(wspace=0.3, hspace=0.03)
-plt.savefig('./mag_flux_new_sun14_%s_%s.png'%(str(used_band[0]), str(used_band[1])), dpi=500, bbox_inches='tight')
+# plt.savefig('./mag_flux_new_sun14_%s_%s.png'%(str(used_band[0]), str(used_band[1])), dpi=500, bbox_inches='tight')
+plt.show()

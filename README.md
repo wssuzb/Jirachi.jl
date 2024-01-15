@@ -20,7 +20,7 @@ Several functions can be found in this project to help us get a better understan
 
 A `JULIA` version for calculating color variation can be found at [run_demo.jl](https://github.com/wssuzb/Jirachi.jl/blob/main/jl/run_demo.jl). Read the [full documentation here.](https://wssuzb.github.io/Jirachi.jl/dev/)
 
-A `PYTHON` version for calculating color variation can be found at [run_demo.py](https://github.com/wssuzb/Jirachi.jl/blob/main/py/run_demo.py).
+A `PYTHON` version for calculating color variation can be found at [run_demo.py](https://github.com/wssuzb/Jirachi.jl/blob/main/py/run_demo.py), tested through `Python 3.8.8`.
 
 Run & plot it!
 
