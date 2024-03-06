@@ -15,7 +15,7 @@ end
 calculate color variation, reference: Su et al., (2023)
 """
 
-function color_variation(lc1::lightcurve, lc2::lightcurve, nsigma=3, erron=true, mode="mag"; showhist=false, err_method="sun2014")
+function color_variation(lc1::lightcurve, lc2::lightcurve, nsigma=3, erron=true, mode="mag"; showhist=false, err_method="sun2014", caltheta=false)
 
     isEqual(lc1, lc2)
     
@@ -45,8 +45,21 @@ function color_variation(lc1::lightcurve, lc2::lightcurve, nsigma=3, erron=true,
     dx_wmax_all = dx_wmax_all[idx]
     
     num_all = dt_all
-    
-    theta = dx_wmax_all ./ dx_wmin_all
+
+    if caltheta == true
+	    theta = 180. / pi * atan.(dx_wmax_all, dx_wmin_all)
+
+	    for i=1: lastindex(theta)
+	        if theta[i] <= -45
+	            theta[i] += 180
+	        elseif theta[i] >= 135
+	            theta[i] -= 180
+	        end
+	    end
+		
+	else
+		theta = dx_wmax_all ./ dx_wmin_all
+	end
 
     if erron
         mmd = @. sqrt(dx_wmin_all ^ 2 + dx_wmax_all ^ 2)
@@ -102,7 +115,7 @@ end
 
 
 
-function binned_color_variation(data::cv, bin_edges::AbstractArray=1:0.2:5)
+function binned_color_variation(data::cv, bin_edges::AbstractArray=1:0.2:5; method="median")
     tau = log10.(data.tau)
     color = data.color
     
@@ -116,7 +129,9 @@ function binned_color_variation(data::cv, bin_edges::AbstractArray=1:0.2:5)
         isempty(bin_all[i]) ? (bin_yerr[i] = 0) : (bin_yerr[i] = err_bootstraped(bin_all[i]))
     end
 
-    bin_value = bin(median, bin_edges, tau, color)
+    bin_value = method == "median" ? bin(median, bin_edges, tau, color) : bin(mean, bin_edges, tau, color)
+    # bin_value = bin(median, bin_edges, tau, color)
+
     _bin_edges = collect(bin_edges)
     bin_width = round.([(_bin_edges[i+1] - _bin_edges[i]) / 2 for i=1: lastindex(_bin_edges)-1], digits=2)
     bin_center = round.(_bin_edges[2:end] .- bin_width, digits=2)

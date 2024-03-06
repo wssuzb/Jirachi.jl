@@ -27,6 +27,13 @@ function runall(
     sf_bin_edges=1:0.1:5, cv_bin_edges=1:0.2:5, nsigma=3, erron=true, nsim=10, fi_np::String="./run_all.h5", lower_bounds = [0, 0, 0, 0.001], upper_bounds = [10, 2e4, 2, 0.1], p0=[], mode="both", t_fit = 10 .^ range(log10(1), log10(6e4), step=0.1), sf_noise_sigma=2
     )
     
+    # here the first time epoch of observation are the same
+
+    # otherwise, 
+    #   t_start = maximum([lc1.time[1], lc2.time[1]])
+    #   lc1.time = lc1.time .- t_start
+    #   lc2.time = lc2.time .- t_start
+
     lc1.time = lc1.time .- lc1.time[1]
     lc1.time = round.(lc1.time * tunits, digits=2)
 
