@@ -1,4 +1,4 @@
-export lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time, bin_light_curve, get_common_lc, bin_lc_edges, remove_lc_outlier, remove_lc_nan
+export lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time, bin_light_curve, get_common_lc, bin_lc_edges, remove_lc_outlier, remove_lc_nan, hcatlc, mergelc
 
 
 @kwdef mutable struct parameters
@@ -239,4 +239,9 @@ function remove_lc_outlier(lc::lightcurve; cut=2, criteria="err")
     end
     
     return lightcurve(lc.time[idx], lc.flux[idx], lc.err[idx], lc.band)
+end
+
+function mergelc(lc::lightcurve...; band)
+    merlc = reduce(vcat, (hcatlc(l) for l in lc))
+    return lightcurve(merlc[:, 1], merlc[:, 2], merlc[:, 3], band)
 end
