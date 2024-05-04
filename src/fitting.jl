@@ -75,7 +75,14 @@ function fitsf_mcmc(data::lightcurve; nsim=1000, lb = [0, 0, 0, 0.001], ub = [10
     binsf = binned_structure_function(_sf, sf_bin_edges)
     
     if mode != "none"
-        _nseed_ = ifelse(isempty(data.band), 1, Int(only(data.band)) - Int('a') + 1)
+        # _nseed_ = ifelse(isempty(data.band), 1, Int(only(data.band)) - Int('a') + 1)
+        # _nseed_ = ifelse(isempty(data.band), 1, Int(sum(Int.(only.(collect("uvm2"))))) - Int('a') + 1)
+
+        _nseed_ = ifelse(
+            isempty(data.band), 
+            1, 
+            Int(sum(Int.(only.(collect(lowercase(data.band)))))) - Int('a') + 1
+            )
 
         Threads.@threads for i=1: nsim
             

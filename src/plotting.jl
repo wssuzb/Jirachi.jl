@@ -92,9 +92,9 @@ function plotsf(binsf1::binned_result, binsf2::binned_result; fitsf1=[], fitsf2=
         isempty(proper_time) ? print(" ") : band!(ax, 10 ^ proper_time[1]:10 ^ proper_time[2], 0.003, 0.1, color= (:red, 0.1))
         # hspan!(-1.1, -0.9, color = (:blue, 0.5))
 
-        xlims!(80, 3e4)
+        # xlims!(80, 3e4)
         # ylims!(4e-3, 2e-1)
-        ylims!(5e-3, 0.1)
+        # ylims!(5e-3, 0.1)
         
         fig
         # resize_to_layout!(fig)

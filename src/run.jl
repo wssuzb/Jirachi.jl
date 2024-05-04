@@ -24,7 +24,7 @@ runall(
 function runall(
     lc1::lightcurve, lc2::lightcurve, lc_edges::AbstractArray; 
     tunits = 24 * 3600, label::String,
-    sf_bin_edges=1:0.1:5, cv_bin_edges=1:0.2:5, nsigma=3, erron=true, nsim=10, fi_np::String="./run_all.h5", lower_bounds = [0, 0, 0, 0.001], upper_bounds = [10, 2e4, 2, 0.1], p0=[], mode="both", t_fit = 10 .^ range(log10(1), log10(6e4), step=0.1), sf_noise_sigma=2
+    sf_bin_edges=1:0.1:5, cv_bin_edges=1:0.2:5, nsigma=3, erron=true, nsim=10, fi_np::String="./run_all.h5", lower_bounds = [0, 0, 0, 0.001], upper_bounds = [10, 2e4, 2, 0.1], p0=[], mode="both", t_fit = 10 .^ range(log10(1), log10(6e4), step=0.1), sf_noise_sigma=2, bootcv=false
     )
     
     # here the first time epoch of observation are the same
@@ -98,11 +98,82 @@ function runall(
 
     bincv_flux = binned_color_variation(cv_flux, cv_bin_edges)
 
+
+
     # cv in mag-mag
     cv_mag_res = color_variation(lc1_bin_com, lc2_bin_com, nsigma, erron, "mag")
     cv_mag = cv_mag_res
 
     bincv_mag = binned_color_variation(cv_mag, cv_bin_edges)
+
+    # bootstrapped
+
+    if bootcv
+        _tmp_cv_flux = zeros(nsim, length(cv_bin_edges)-1)
+        _tmp_cv_mag = zeros(nsim, length(cv_bin_edges)-1)
+
+        nseed_1 = ifelse(
+            isempty(lc1.band), 
+            1, 
+            Int(sum(Int.(only.(collect(lowercase(lc1.band)))))) - Int('a') + 1
+            )
+        nseed_2 = ifelse(
+            isempty(lc2.band), 
+            1, 
+            Int(sum(Int.(only.(collect(lowercase(lc2.band)))))) - Int('a') + 1
+            )
+        # nseed_1 = ifelse(isempty(lc1.band), 1, Int(only(lc1.band)) - Int('a') + 1)
+        # nseed_2 = ifelse(isempty(lc2.band), 1, Int(only(lc2.band)) - Int('a') + 1)
+
+        Threads.@threads for i=1: nsim
+            
+            nseed1 = i + nseed_1 * nsim
+            nseed2 = i + nseed_2 * nsim
+            
+            lc1_tmp = lc_bootstrapped(lc1; seed = nseed1, mode = "rss")
+            lc2_tmp = lc_bootstrapped(lc2; seed = nseed2, mode = "rss")
+
+            lc1_bin_nan_tmp = bin_light_curve(lc1_tmp; lc_edges = lc_edges)
+    
+            lc2_bin_nan_tmp = bin_light_curve(lc2_tmp; lc_edges = lc_edges)
+
+            lc1_bin_tmp = remove_lc_nan(lc1_bin_nan_tmp)
+            lc2_bin_tmp = remove_lc_nan(lc2_bin_nan_tmp)
+            lc1_bin_com_tmp, lc2_bin_com_tmp = get_common_lc(lc1_bin_tmp, lc2_bin_tmp)
+ 
+            cv_flux_res_tmp = color_variation(lc1_bin_com_tmp, lc2_bin_com_tmp, nsigma, erron, "flux")
+            
+            bincv_flux_tmp = binned_color_variation(cv_flux_res_tmp, cv_bin_edges)
+
+
+            cv_mag_res_tmp = color_variation(lc1_bin_com_tmp, lc2_bin_com_tmp, nsigma, erron, "mag")
+
+
+            bincv_mag_tmp = binned_color_variation(cv_mag_res_tmp, cv_bin_edges)
+
+            _tmp_cv_flux[i, :] = bincv_flux_tmp.y
+            _tmp_cv_mag[i, :] = bincv_mag_tmp.y
+
+        end
+
+        cv_err_flux = zeros(length(cv_bin_edges) - 1, 1)
+        cv_err_mag = zeros(length(cv_bin_edges) - 1, 1)
+
+        for i=1: length(cv_bin_edges) - 1
+            try
+                cv_err_flux[i, 1] = std(filter(!isnan, _tmp_cv_flux[:, i]))
+                cv_err_mag[i, 1] = std(filter(!isnan, _tmp_cv_mag[:, i]))
+            catch y
+                # warn("Exception: ", y) # What to do on error.
+                println("Warning!!!")
+            end
+        end
+
+        bincv_flux.yerr = cv_err_flux[:, 1]
+        bincv_mag.yerr = cv_err_mag[:, 1]
+
+    end
+
     
     _sf = zeros(length(binsf1.x), 4, 2)
     _sf[:,:,1] = [binsf1.x binsf1.xerr binsf1.y binsf1.yerr]
