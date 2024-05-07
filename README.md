@@ -32,6 +32,7 @@ TODO:
 - [ ] reprocessing model
 - [ ] structure function calculation (see kozlowski+16)
 - [ ] update the tutorial ...
+- [ ] lag calculation, mainly convert PYCCF to julia version
 
 ## Install
 
