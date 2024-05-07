@@ -10,17 +10,17 @@
 
 ## About this project
 
-Several functions can be found in this project to help us get a better understand of the central engine of AGNs:
+Several functions can be found in this project to help us get a better understanding of the central engine of AGNs:
 
-- timescale-dependent color variation calculation.
-- structure function calculation and fits.
+- timescale-dependent color variation (CV) calculation.
+- structure-function (SF) calculation and fits.
 - generate stochastic process light curves.
 - fractional variability.
 - ...
 
-A `JULIA` version for calculating color variation can be found at [run_demo.jl](https://github.com/wssuzb/Jirachi.jl/blob/main/jl/run_demo.jl). Read the [full documentation here.](https://wssuzb.github.io/Jirachi.jl/dev/)
+A `JULIA` version for calculating SF and color variation can be found at [run_demo.jl](https://github.com/wssuzb/Jirachi.jl/blob/main/jl/run_demo.jl). Read the [full documentation here.](https://wssuzb.github.io/Jirachi.jl/dev/)
 
-A `PYTHON` version for calculating color variation can be found at [run_demo.py](https://github.com/wssuzb/Jirachi.jl/blob/main/py/run_demo.py), tested through `Python 3.8.8`.
+A `PYTHON` version for calculating SF and color variation can be found at [run_demo.py](https://github.com/wssuzb/Jirachi.jl/blob/main/py/run_demo.py), tested through `Python 3.8.8`.
 
 Run & plot it!
 
