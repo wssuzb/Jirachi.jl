@@ -50,10 +50,11 @@ julia> using Jirachi
 ```
 enjoy!
 
-
 ## Citing
 
 If this project makes your life easier, please cite this code below:
+
+- [A new timescale-mass scaling for the optical variation of active galactic nuclei across the intermediate-mass to supermassive scales](https://arxiv.org/abs/2405.02584)
 
 ```
 @misc{su2024new,
