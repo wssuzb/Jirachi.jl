@@ -31,6 +31,7 @@ TODO:
 
 - [ ] reprocessing model
 - [ ] structure function calculation (see kozlowski+16)
+- [ ] update the tutorial ...
 
 ## Install
 
@@ -51,7 +52,20 @@ enjoy!
 
 ## Citing
 
-If this project makes you life easier, pls. cites this code as below:
+If this project makes your life easier, please cite this code below:
+
+```
+@misc{su2024new,
+      title={A new timescale-mass scaling for the optical variation of active galactic nuclei across the intermediate-mass to supermassive scales}, 
+      author={Zhen-Bo Su and Zhen-Yi Cai and Mouyuan Sun and Hengxiao Guo and Wei-Min Gu and Jun-Xian Wang},
+      year={2024},
+      eprint={2405.02584},
+      archivePrefix={arXiv},
+      primaryClass={astro-ph.GA}
+}
+```
+
+or
 
 ```bib
 @software{jirachi,
