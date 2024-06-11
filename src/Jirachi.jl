@@ -16,6 +16,10 @@ using LsqFit
 using LinearAlgebra
 using CairoMakie
 using MakiePublication
+using Distributions
+
+
+
 
 include("utils.jl")
 include("structure_function.jl")
@@ -26,6 +30,7 @@ include("showinfo.jl")
 include("run.jl")
 include("plotting.jl")
 include("generateDRW.jl")
+include("ccf.jl")
 
 export lightcurve, cv, sf, binned_result, percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time, get_common_lc, bin_light_curve, bin_lc_edges, remove_lc_outlier, remove_lc_nan, hcatlc, mergelc
 
@@ -39,5 +44,6 @@ export stochastic_process
 
 export IntegerTicks, theme_lc, theme_sf, plotlc, plotsf, plotcv
 
+export corsig, xcor
 
 end
