@@ -252,32 +252,39 @@ function xcor_mc(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float6
         pc_pack = peakcent(lc1_new, lc2_new, trange, tunit, 
         thres, siglevel, imode, sigmode)
 
-        # if pc_pack.status_peak == 1
-        #     tau_peak = pc_pack.tlag_peak
-        #     push!(tlags_peak, tau_peak)
+        if pc_pack.status_peak == 1
+            tau_peak = pc_pack.tlag_peak
+            push!(tlags_peak, tau_peak)
 
-        #     pval = pc_pack.peak_pvalue
-        #     push!(pvals, pval)
-        #     nsuccess_peak += 1
-        # elseif pc_pack.status_peak == 0
-        #     nfail_peak += 1
-        # end
+            pval = pc_pack.peak_pvalue
+            push!(pvals, pval)
+            nsuccess_peak += 1
+        elseif pc_pack.status_peak == 0
+            nfail_peak += 1
+        end
 
-        # # if pc_pack.status_centroid == 1
-        #     tau_centroid = pc_pack.tlag_centroid
-        #     push!(tlags_centroid, tlag_centroid)
-        #     nsuccess_centroid += 1
-        # else
-        #     nfail_centroid += 1
-        # end
+        if pc_pack.status_centroid == 1
+            tau_centroid = pc_pack.tlag_centroid
+            push!(tlags_centroid, tlag_centroid)
+            nsuccess_centroid += 1
+        else
+            nfail_centroid += 1
+        end
 
-        (pc_pack.status_peak == 1) ? (push!(tlags_peak, pc_pack.tlag_peak)) && (push!(pvals, pc_pack.peak_pvalue)) && (nsuccess_peak += 1) : (nfail_peak += 1)
+        if pc_pack.status_rval == 1
+            push!(max_rvals, pc_pack.max_rval)
+            nsuccess_rvals += 1
+        else
+            nfail_rvals += 1
+        end
 
-        (pc_pack.status_centroid == 1) ? (push!(tlags_centroid, pc_pack.tlag_centroid)) && (nsuccess_centroid += 1) : (nfail_centroid += 1)
+        # (pc_pack.status_peak == 1) ? (push!(tlags_peak, pc_pack.tlag_peak)) && (push!(pvals, pc_pack.peak_pvalue)) && (nsuccess_peak += 1) : (nfail_peak += 1)
 
-        (pc_pack.status_rval == 1) ? (push!(max_rvals, pc_pack.max_rval)) && (nsuccess_rvals += 1) : (nfail_rvals += 1)
+        # (pc_pack.status_centroid == 1) ? (push!(tlags_centroid, pc_pack.tlag_centroid)) && (nsuccess_centroid += 1) : (nfail_centroid += 1)
+        # (pc_pack.status_rval == 1) ? (push!(max_rvals, pc_pack.max_rval)) && (nsuccess_rvals += 1) : (nfail_rvals += 1)
+                
 
     end
-    
+
     return (tlags_peak=tlags_peak, tlags_centroid=tlags_centroid, nsuccess_peak=nsuccess_peak, nfail_peak=nfail_peak, nsuccess_centroid=nsuccess_centroid, nfail_centroid=nfail_centroid, max_rvals=max_rvals, nfail_rvals=nfail_rvals, pvals=pvals)
 end
