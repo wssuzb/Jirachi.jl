@@ -1,4 +1,4 @@
-export corsig, xcor, peakcent
+export corsig, xcor, peakcent, xcor_mc
 
 function corsig(r, v)
     tst = r * sqrt(v / (1 - r ^ 2))
@@ -234,38 +234,25 @@ function xcor_mc(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float6
 
     Threads.@threads for i=1: nsim
 
-        
-        mycheck = true
-        while mycheck
-            lc1_new = lc_bootstrapped(lc1, i, mcmode)
+        lc1_new = lc_bootstrapped(lc1; seed = i, mode = mcmode)
+        lc2_new = lc_bootstrapped(lc2; seed = i, mode = mcmode)
 
-            (length(lc1_rss.time) > 1) ? (mycheck = false) : (mycheck = true)
-        end
+        (length(lc1_new.time) < 2) | (length(lc2_new.time) < 2) && continue
 
-        mycheck = true
-
-        while mycheck
-            lc2_new = lc_bootstrapped(lc2, i, mcmode)
-            (length(lc2_rss.time) > 1) ? (mycheck = false) : (mycheck = true)
-        end
-
-        pc_pack = peakcent(lc1_new, lc2_new, trange, tunit, 
-        thres, siglevel, imode, sigmode)
+        pc_pack = peakcent(lc1_new, lc2_new, trange, tunit, thres, siglevel, imode, sigmode)
 
         if pc_pack.status_peak == 1
-            tau_peak = pc_pack.tlag_peak
-            push!(tlags_peak, tau_peak)
-
-            pval = pc_pack.peak_pvalue
-            push!(pvals, pval)
+            
+            push!(tlags_peak, pc_pack.tlag_peak)
+            push!(pvals, pc_pack.peak_pvalue)
+            
             nsuccess_peak += 1
         elseif pc_pack.status_peak == 0
             nfail_peak += 1
         end
 
         if pc_pack.status_centroid == 1
-            tau_centroid = pc_pack.tlag_centroid
-            push!(tlags_centroid, tlag_centroid)
+            push!(tlags_centroid, pc_pack.tlag_centroid)
             nsuccess_centroid += 1
         else
             nfail_centroid += 1
@@ -277,14 +264,91 @@ function xcor_mc(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float6
         else
             nfail_rvals += 1
         end
+    end
 
-        # (pc_pack.status_peak == 1) ? (push!(tlags_peak, pc_pack.tlag_peak)) && (push!(pvals, pc_pack.peak_pvalue)) && (nsuccess_peak += 1) : (nfail_peak += 1)
 
-        # (pc_pack.status_centroid == 1) ? (push!(tlags_centroid, pc_pack.tlag_centroid)) && (nsuccess_centroid += 1) : (nfail_centroid += 1)
-        # (pc_pack.status_rval == 1) ? (push!(max_rvals, pc_pack.max_rval)) && (nsuccess_rvals += 1) : (nfail_rvals += 1)
-                
+
+    return (tlags_peak=tlags_peak, tlags_centroid=tlags_centroid, nsuccess_peak=nsuccess_peak, nfail_peak=nfail_peak, nsuccess_centroid=nsuccess_centroid, nfail_centroid=nfail_centroid, max_rvals=max_rvals, nfail_rvals=nfail_rvals, pvals=pvals)
+end
+
+
+function interpolate_with_max_gap(orig_x, orig_y, target_x, max_gap=9999, orig_x_is_sorted=false, target_x_is_sorted=false)
+
+    if !orig_x_is_sorted
+        idx = sortperm(orig_x)
+        orig_x = orig_x[idx]
+        orig_y = orig_y[idx]
+    end
+
+    if !target_x_is_sorted
+        target_idx = sortperm(target_x)
+        target_idx_for_reverse = sortperm(target_idx)
+        target_x = target_x[target_idx]
+    end
+
+    target_y = zeros(length(target_x))
+    idx_orig = 0
+    orig_gone_through = false
+
+    for (idx_target, x_new) in enumerate(target_x)
+        while !orig_gone_through
+            if idx_orig +1 >= length(orig_x)
+                orig_gone_through = true
+
+            elseif x_new > orig_x[idx_orig + 1]
+                idx_orig += 1
+            else
+                break
+            end
+
+        end
+        
+        if orig_gone_through
+            target_y[idx_target] = NaN
+            continue
+        end
+
+        x1 = orig_x[idx_orig]
+        y1 = orig_y[idx_orig]
+        x2 = orig_x[idx_orig + 1]
+        y2 = orig_y[idx_orig + 1]
+
+
+        if x_new < 1
+            target_y[idx_target] = NaN
+            continue
+        end
+
+        Δx = x2 - x1
+
+        if Δx > max_gap
+            target_y[idx_target] = NaN
+            continue
+        end
+
+        Δy = y2 - y1
+
+        if Δx == 0
+            target_y[idx_target] = NaN
+            continue
+
+        end
+
+        k = Δy / Δx
+
+        Δx_new = x_new - 1
+        Δy_new = k * Δx_new
+        y_new = y1 + Δy_new
+
+        target_y[idx_target] = y_new
 
     end
 
-    return (tlags_peak=tlags_peak, tlags_centroid=tlags_centroid, nsuccess_peak=nsuccess_peak, nfail_peak=nfail_peak, nsuccess_centroid=nsuccess_centroid, nfail_centroid=nfail_centroid, max_rvals=max_rvals, nfail_rvals=nfail_rvals, pvals=pvals)
+    if !target_x_is_sorted
+        res = target_y[target_idx_for_reverse]
+    else
+        res = target_y
+    end
+
+    return res
 end
