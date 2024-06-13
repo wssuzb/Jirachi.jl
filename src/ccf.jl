@@ -6,7 +6,9 @@ function corsig(r, v)
     return pvalue
 end
 
-function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64}, tunit::Float64, imode::Int64)
+
+
+function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64}, tunit::Float64, imode::Int64, itp_gap::Tuple{Symbol, Float64})
 
     tlagmin, tlagmax = trange
     
@@ -35,15 +37,32 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
         knot = sum(selin)
 
         if knot >0
-        
-            itp = linear_interpolation(t2, y2,extrapolation_bc=Line())
-            y2new = itp.(t2new[selin])
+            if (itp_gap[1] == :no)
+                y2new = interpolate_with_max_gap(t2, y2, t2new[selin], max_gap)
+                
+                idx = all.(isfinite, y2new) # find values without nan
+                new_itp = linear_interpolation(t2new[selin], y1, extrapolation_bc = Line())
+                y1new = new_itp.(t2new[selin][idx])
 
-            y1sum = sum(y1[selin])
-            y1sqsum = sum(y1[selin] .* y1[selin])
-            y2sum = sum(y2new)
-            y2sqsum = sum(y2new .* y2new)
-            y1y2sum = sum(y1[selin] .* y2new)
+                y1sum = sum(y1new)
+                y1sqsum = sum(y1new .* y1new)
+
+                y2sum = sum(y2new)
+                y2sqsum = sum(y2new .* y2new)
+                y1y2sum = sum(y1new .* y2new)
+
+            else
+                itp = linear_interpolation(t2, y2, extrapolation_bc=Line())
+                y2new = itp.(t2new[selin])
+                y1new = y1[selin]
+
+                y1sum = sum(y1new)
+                y1sqsum = sum(y1new .* y1new)
+                y2sum = sum(y2new)
+                y2sqsum = sum(y2new .* y2new)
+                y1y2sum = sum(y1new .* y2new)
+            end
+
             
             fn = float(knot)
             rd1_sq = @. fn * y2sqsum - y2sum * y2sum
@@ -57,7 +76,6 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
             push!(ccf12, Float64(r))
             push!(taulist12, Float64(tau))
             push!(npts12, Int64(knot))
-
 
         end
 
@@ -74,14 +92,32 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
         knot = sum(selin)
         if knot > 0
             
-            itp = linear_interpolation(t1, y1,extrapolation_bc=Line())
-            y1new = itp.(t1new[selin])
-            
-            y2sum = sum(y2[selin])
-            y2sqsum = sum(y2[selin] .* y2[selin])
-            y1sum = sum(y1new)
-            y1sqsum = sum(y1new .* y1new)
-            y1y2sum = sum(y1new .* y2[selin])
+            if (itp_gap[1] == :no)
+
+                y1new = interpolate_with_max_gap(t1, y1, t1new[selin], max_gap)
+                
+                idx = all.(isfinite, y1new) # find values without nan
+                new_itp = linear_interpolation(t1new[selin], y2, extrapolation_bc = Line())
+                y1new = new_itp.(t1new[selin][idx])
+
+                y1sum = sum(y1new)
+                y1sqsum = sum(y1new .* y1new)
+
+                y2sum = sum(y2new)
+
+                y2sqsum = sum(y2new .* y2new)
+                y1y2sum = sum(y1new .* y2new)
+
+            else
+                itp = linear_interpolation(t1, y1,extrapolation_bc=Line())
+                y1new = itp.(t1new[selin])
+                
+                y2sum = sum(y2[selin])
+                y2sqsum = sum(y2[selin] .* y2[selin])
+                y1sum = sum(y1new)
+                y1sqsum = sum(y1new .* y1new)
+                y1y2sum = sum(y1new .* y2[selin])
+            end
 
             fn = float(knot)
             rd1_sq = @. fn * y2sqsum - y2sum * y2sum
@@ -131,14 +167,14 @@ end
 function peakcent(
     lc1::lightcurve, lc2::lightcurve,
     trange::Tuple{Float64, Float64}, tunit::Float64, 
-    thres::Float64, siglevel::Float64, imode::Int, sigmode::Float64
+    thres::Float64, siglevel::Float64, imode::Int, sigmode::Float64, itp_gap::Tuple{Symbol, Float64}=(:no, 60.0)
     )
 
     tlagmin, tlagmax = trange
 
     alpha = 1.0 - siglevel
 
-    ccf_pack = xcor(lc1, lc2, trange, tunit, imode)
+    ccf_pack = xcor(lc1, lc2, trange, tunit, imode, itp_gap)
     
     max_indx = argmax(ccf_pack.ccf)
     max_rval = ccf_pack.ccf[max_indx]
@@ -147,6 +183,7 @@ function peakcent(
 
     if sigmode > 0
         if (max_rval >= sigmode) && (ccf_pack.taulist[max_indx] > tlagmin) && (ccf_pack.taulist[max_indx] < tlagmax)
+
             tlag_peak = ccf_pack.taulist[max_indx]
             max_rval = max_rval
             status_peak = 1
@@ -272,7 +309,7 @@ function xcor_mc(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float6
 end
 
 
-function interpolate_with_max_gap(orig_x, orig_y, target_x, max_gap=9999, orig_x_is_sorted=false, target_x_is_sorted=false)
+function interpolate_with_max_gap(target_x, orig_x, orig_y, max_gap=9999, orig_x_is_sorted=false, target_x_is_sorted=false)
 
     if !orig_x_is_sorted
         idx = sortperm(orig_x)
@@ -336,7 +373,7 @@ function interpolate_with_max_gap(orig_x, orig_y, target_x, max_gap=9999, orig_x
 
         k = Δy / Δx
 
-        Δx_new = x_new - 1
+        Δx_new = x_new - x1
         Δy_new = k * Δx_new
         y_new = y1 + Δy_new
 
@@ -351,4 +388,30 @@ function interpolate_with_max_gap(orig_x, orig_y, target_x, max_gap=9999, orig_x
     end
 
     return res
+end
+
+
+
+
+function do_with_gap(xint, x0, y0, maxgap)
+    
+    # some problems... need to debug
+
+    itp = LinearInterpolation(x0, y0, extrapolation_bc=Line())
+    yint = itp.(xint)
+
+    x_index = searchsortedfirst.(Ref(x0), xint)
+    x_index = clamp!(x_index, 0, length(x0) - 1)
+
+    dx = vcat(0, diff(x0))
+
+    index = @. (dx[x_index] > maxgap)
+
+    x_index = searchsortedfirst.(Ref(x0), xint)
+    x_index = clamp!(x_index, 0, length(x0) - 1)
+    dx = vcat(0, diff(x0))
+    index = @. (index) & (dx[x_index] > maxgap)
+
+    yint[index] .= NaN
+    return yint
 end
