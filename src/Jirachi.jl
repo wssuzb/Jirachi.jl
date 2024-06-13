@@ -44,6 +44,6 @@ export stochastic_process
 
 export IntegerTicks, theme_lc, theme_sf, plotlc, plotsf, plotcv
 
-export corsig, xcor, peakcent, xcor_mc
+export corsig, xcor, peakcent, xcor_mc, interpolate_with_max_gap
 
 end

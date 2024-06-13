@@ -1,4 +1,4 @@
-export corsig, xcor, peakcent, xcor_mc
+export corsig, xcor, peakcent, xcor_mc, interpolate_with_max_gap
 
 function corsig(r, v)
     tst = r * sqrt(v / (1 - r ^ 2))
@@ -8,7 +8,7 @@ end
 
 
 
-function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64}, tunit::Float64, imode::Int64, itp_gap::Tuple{Symbol, Float64})
+function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64}, tunit::Float64, imode::Int64, itp_gap::Tuple{Symbol, Float64}=(:no, 60.0))
 
     tlagmin, tlagmax = trange
     
@@ -36,13 +36,15 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
         
         knot = sum(selin)
 
-        if knot >0
+        if knot > 0
             if (itp_gap[1] == :no)
-                y2new = interpolate_with_max_gap(t2, y2, t2new[selin], max_gap)
+                y2new = interpolate_with_max_gap(t2, y2, t2new, itp_gap[2])
                 
                 idx = all.(isfinite, y2new) # find values without nan
-                new_itp = linear_interpolation(t2new[selin], y1, extrapolation_bc = Line())
-                y1new = new_itp.(t2new[selin][idx])
+                y2new = y2new[idx]
+
+                new_itp = linear_interpolation(t2new, y1, extrapolation_bc = Line())
+                y1new = new_itp.(t2new[idx])
 
                 y1sum = sum(y1new)
                 y1sqsum = sum(y1new .* y1new)
@@ -50,6 +52,8 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
                 y2sum = sum(y2new)
                 y2sqsum = sum(y2new .* y2new)
                 y1y2sum = sum(y1new .* y2new)
+                
+                knot = length(y2new)
 
             else
                 itp = linear_interpolation(t2, y2, extrapolation_bc=Line())
@@ -94,29 +98,34 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
             
             if (itp_gap[1] == :no)
 
-                y1new = interpolate_with_max_gap(t1, y1, t1new[selin], max_gap)
+                y1new = interpolate_with_max_gap(t1, y1, t1new, itp_gap[2])
                 
                 idx = all.(isfinite, y1new) # find values without nan
-                new_itp = linear_interpolation(t1new[selin], y2, extrapolation_bc = Line())
-                y1new = new_itp.(t1new[selin][idx])
+                y1new = y1new[idx]
+
+                new_itp = linear_interpolation(t1new, y2, extrapolation_bc = Line())
+
+                y2new = new_itp.(t1new[idx])
 
                 y1sum = sum(y1new)
                 y1sqsum = sum(y1new .* y1new)
-
+                    
                 y2sum = sum(y2new)
 
                 y2sqsum = sum(y2new .* y2new)
                 y1y2sum = sum(y1new .* y2new)
+                
+                knot = length(y1new)
 
             else
                 itp = linear_interpolation(t1, y1,extrapolation_bc=Line())
                 y1new = itp.(t1new[selin])
-                
-                y2sum = sum(y2[selin])
-                y2sqsum = sum(y2[selin] .* y2[selin])
+                y2new = y2[selin]
+                y2sum = sum(y2new)
+                y2sqsum = sum(y2new .* y2new)
                 y1sum = sum(y1new)
                 y1sqsum = sum(y1new .* y1new)
-                y1y2sum = sum(y1new .* y2[selin])
+                y1y2sum = sum(y1new .* y2new)
             end
 
             fn = float(knot)
@@ -252,7 +261,7 @@ function peakcent(
     
 end
 
-function xcor_mc(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64}, tunit::Float64, thres::Float64, siglevel::Float64, imode::Int64, nsim::Int64, mcmode::String, sigmode::Float64)
+function xcor_mc(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64}, tunit::Float64, thres::Float64, siglevel::Float64, imode::Int64, nsim::Int64, mcmode::String, sigmode::Float64, itp_gap::Tuple{Symbol, Float64}=(:no, 60.0))
 
     numt1, numt2 = length(lc1.time), length(lc2.time)
     
@@ -276,7 +285,7 @@ function xcor_mc(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float6
 
         (length(lc1_new.time) < 2) | (length(lc2_new.time) < 2) && continue
 
-        pc_pack = peakcent(lc1_new, lc2_new, trange, tunit, thres, siglevel, imode, sigmode)
+        pc_pack = peakcent(lc1_new, lc2_new, trange, tunit, thres, siglevel, imode, sigmode, itp_gap)
 
         if pc_pack.status_peak == 1
             
@@ -309,7 +318,7 @@ function xcor_mc(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float6
 end
 
 
-function interpolate_with_max_gap(target_x, orig_x, orig_y, max_gap=9999, orig_x_is_sorted=false, target_x_is_sorted=false)
+function interpolate_with_max_gap(orig_x, orig_y, target_x, max_gap=9999, orig_x_is_sorted=false, target_x_is_sorted=false)
 
     if !orig_x_is_sorted
         idx = sortperm(orig_x)
@@ -368,7 +377,6 @@ function interpolate_with_max_gap(target_x, orig_x, orig_y, max_gap=9999, orig_x
         if Δx == 0
             target_y[idx_target] = NaN
             continue
-
         end
 
         k = Δy / Δx
@@ -393,25 +401,25 @@ end
 
 
 
-function do_with_gap(xint, x0, y0, maxgap)
+# function do_with_gap(xint, x0, y0, maxgap)
     
-    # some problems... need to debug
+#     # some problems... need to debug
 
-    itp = LinearInterpolation(x0, y0, extrapolation_bc=Line())
-    yint = itp.(xint)
+#     itp = LinearInterpolation(x0, y0, extrapolation_bc=Line())
+#     yint = itp.(xint)
 
-    x_index = searchsortedfirst.(Ref(x0), xint)
-    x_index = clamp!(x_index, 0, length(x0) - 1)
+#     x_index = searchsortedfirst.(Ref(x0), xint)
+#     x_index = clamp!(x_index, 0, length(x0) - 1)
 
-    dx = vcat(0, diff(x0))
+#     dx = vcat(0, diff(x0))
 
-    index = @. (dx[x_index] > maxgap)
+#     index = @. (dx[x_index] > maxgap)
 
-    x_index = searchsortedfirst.(Ref(x0), xint)
-    x_index = clamp!(x_index, 0, length(x0) - 1)
-    dx = vcat(0, diff(x0))
-    index = @. (index) & (dx[x_index] > maxgap)
+#     x_index = searchsortedfirst.(Ref(x0), xint)
+#     x_index = clamp!(x_index, 0, length(x0) - 1)
+#     dx = vcat(0, diff(x0))
+#     index = @. (index) & (dx[x_index] > maxgap)
 
-    yint[index] .= NaN
-    return yint
-end
+#     yint[index] .= NaN
+#     return yint
+# end
