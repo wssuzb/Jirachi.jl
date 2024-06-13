@@ -36,15 +36,15 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
         
         knot = sum(selin)
 
-        if knot > 0
+        if knot >0
             if (itp_gap[1] == :no)
-                y2new = interpolate_with_max_gap(t2, y2, t2new, itp_gap[2])
+                y2new = interpolate_with_max_gap(t2, y2, t2new[selin], itp_gap[2])
                 
                 idx = all.(isfinite, y2new) # find values without nan
                 y2new = y2new[idx]
 
                 new_itp = linear_interpolation(t2new, y1, extrapolation_bc = Line())
-                y1new = new_itp.(t2new[idx])
+                y1new = new_itp.(t2new[selin][idx])
 
                 y1sum = sum(y1new)
                 y1sqsum = sum(y1new .* y1new)
@@ -53,7 +53,7 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
                 y2sqsum = sum(y2new .* y2new)
                 y1y2sum = sum(y1new .* y2new)
                 
-                knot = length(y2new)
+                knot = length(y1new)
 
             else
                 itp = linear_interpolation(t2, y2, extrapolation_bc=Line())
@@ -98,14 +98,14 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
             
             if (itp_gap[1] == :no)
 
-                y1new = interpolate_with_max_gap(t1, y1, t1new, itp_gap[2])
+                y1new = interpolate_with_max_gap(t1, y1, t1new[selin], itp_gap[2])
                 
                 idx = all.(isfinite, y1new) # find values without nan
                 y1new = y1new[idx]
 
                 new_itp = linear_interpolation(t1new, y2, extrapolation_bc = Line())
 
-                y2new = new_itp.(t1new[idx])
+                y2new = new_itp.(t1new[selin][idx])
 
                 y1sum = sum(y1new)
                 y1sqsum = sum(y1new .* y1new)
@@ -116,7 +116,6 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
                 y1y2sum = sum(y1new .* y2new)
                 
                 knot = length(y1new)
-
             else
                 itp = linear_interpolation(t1, y1,extrapolation_bc=Line())
                 y1new = itp.(t1new[selin])
