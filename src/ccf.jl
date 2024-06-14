@@ -31,11 +31,8 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
     
     while tau < tau_max
         t2new = @. t1 + tau
-        
         selin = minimum(t2) .<= t2new .<= maximum(t2)
-        
         knot = sum(selin)
-
         if knot >0
             if (itp_gap[1] == :no)
                 y2new = interpolate_with_max_gap(t2, y2, t2new[selin], itp_gap[2])
@@ -82,7 +79,6 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
             push!(npts12, Int64(knot))
 
         end
-
         tau += tunit
     end
 
@@ -92,29 +88,20 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
 
         t1new = @. t2 - tau
         selin = minimum(t1) .<= t1new .<= maximum(t1)
-        
         knot = sum(selin)
-        if knot > 0
-            
-            if (itp_gap[1] == :no)
 
-                y1new = interpolate_with_max_gap(t1, y1, t1new[selin], itp_gap[2])
-                
+        if knot > 0
+            if (itp_gap[1] == :no)
+                y1new = interpolate_with_max_gap(t1, y1, t1new[selin], itp_gap[2])        
                 idx = all.(isfinite, y1new) # find values without nan
                 y1new = y1new[idx]
-
                 new_itp = linear_interpolation(t1new, y2, extrapolation_bc = Line())
-
                 y2new = new_itp.(t1new[selin][idx])
-
                 y1sum = sum(y1new)
                 y1sqsum = sum(y1new .* y1new)
-                    
                 y2sum = sum(y2new)
-
                 y2sqsum = sum(y2new .* y2new)
                 y1y2sum = sum(y1new .* y2new)
-                
                 knot = length(y1new)
             else
                 itp = linear_interpolation(t1, y1,extrapolation_bc=Line())
@@ -130,7 +117,6 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
             fn = float(knot)
             rd1_sq = @. fn * y2sqsum - y2sum * y2sum
             rd2_sq = @. fn * y1sqsum - y1sum * y1sum
-
 
             (rd1_sq > 0) ? (rd1 = sqrt(rd1_sq)) : (rd1 = 0.0)
             (rd2_sq > 0) ? (rd2 = sqrt(rd2_sq)) : (rd2 = 0.0)
@@ -152,13 +138,11 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
             npts = npts12
         else
             taulist = intersect(taulist12, taulist21)
-
             sel_cb12 = findall(in(taulist21), taulist12)
             sel_cb21 = findall(in(view(taulist12, sel_cb12)), taulist21)
 
             ccf = @. (ccf12[sel_cb12] + ccf21[sel_cb21]) * 0.5
             npts = @. (npts12[sel_cb12] + npts21[sel_cb21]) * 0.5
-
         end
     elseif imode == 1
         ccf = ccf21
@@ -191,7 +175,6 @@ function peakcent(
 
     if sigmode > 0
         if (max_rval >= sigmode) && (ccf_pack.taulist[max_indx] > tlagmin) && (ccf_pack.taulist[max_indx] < tlagmax)
-
             tlag_peak = ccf_pack.taulist[max_indx]
             max_rval = max_rval
             status_peak = 1
@@ -229,11 +212,10 @@ function peakcent(
     end
 
     if status_peak == 1
+
         rcent = thres * max_rval
         rdif_neg = @. (ccf_pack.ccf - rcent < 0.0)
-        
         tlag_rneg = @. ccf_pack.taulist[rdif_neg] - tlag_peak
-        
         tlag_leftall = @. abs(tlag_rneg[tlag_rneg .< 0])
         tlag_rightall = @. abs(tlag_rneg[tlag_rneg .> 0])
 
@@ -244,9 +226,7 @@ function peakcent(
                 tlag_centroid = sum(ccf_pack.ccf[rdif_pos] .* ccf_pack.taulist[rdif_pos]) / sum(ccf_pack.ccf[rdif_pos])
                 status_centroid = 1
             end
-
         end
-
     end
 
     if status_centroid == 0
@@ -287,10 +267,8 @@ function xcor_mc(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float6
         pc_pack = peakcent(lc1_new, lc2_new, trange, tunit, thres, siglevel, imode, sigmode, itp_gap)
 
         if pc_pack.status_peak == 1
-            
             push!(tlags_peak, pc_pack.tlag_peak)
             push!(pvals, pc_pack.peak_pvalue)
-            
             nsuccess_peak += 1
         elseif pc_pack.status_peak == 0
             nfail_peak += 1
@@ -339,13 +317,11 @@ function interpolate_with_max_gap(orig_x, orig_y, target_x, max_gap=9999, orig_x
         while !orig_gone_through
             if idx_orig +1 >= length(orig_x)
                 orig_gone_through = true
-
             elseif x_new > orig_x[idx_orig + 1]
                 idx_orig += 1
             else
                 break
             end
-
         end
         
         if orig_gone_through
@@ -358,34 +334,28 @@ function interpolate_with_max_gap(orig_x, orig_y, target_x, max_gap=9999, orig_x
         x2 = orig_x[idx_orig + 1]
         y2 = orig_y[idx_orig + 1]
 
-
         if x_new < 1
             target_y[idx_target] = NaN
             continue
         end
 
         Δx = x2 - x1
-
         if Δx > max_gap
             target_y[idx_target] = NaN
             continue
         end
 
         Δy = y2 - y1
-
         if Δx == 0
             target_y[idx_target] = NaN
             continue
         end
 
         k = Δy / Δx
-
         Δx_new = x_new - x1
         Δy_new = k * Δx_new
         y_new = y1 + Δy_new
-
         target_y[idx_target] = y_new
-
     end
 
     if !target_x_is_sorted
@@ -399,6 +369,20 @@ end
 
 
 
+function find_gap(lc1::lightcurve, lc2::lightcurve, max_gap::T=60) where {T}
+    # get gap in lightcurve 1
+    idx1 = findall(vcat(0, diff(lc1.time)) .>= max_gap)
+    gap1 = (lc1.time[idx] .+ lc1.time[idx.-1]) * 0.5
+    # get gap in lightcurve 2
+    idx2 = findall(vcat(0, diff(lc2.time)) .>= max_gap)
+    gap2 = (lc2.time[idx1] .+ lc2.time[idx2.-1]) * 0.5
+    
+    length(gap1) > length(gap2) ? gap = gap1 : gap = gap2
+
+    # add start and end to the gap
+    gap = vcat(0, gap, maximum([maximum(lc1.time), maximum(lc2.time)]) + max_gap)
+    return gap
+end
 
 # function do_with_gap(xint, x0, y0, maxgap)
     
