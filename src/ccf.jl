@@ -372,10 +372,10 @@ end
 function find_gap(lc1::lightcurve, lc2::lightcurve, max_gap::T=60) where {T}
     # get gap in lightcurve 1
     idx1 = findall(vcat(0, diff(lc1.time)) .>= max_gap)
-    gap1 = (lc1.time[idx] .+ lc1.time[idx.-1]) * 0.5
+    gap1 = (lc1.time[idx1] .+ lc1.time[idx1 .- 1]) * 0.5
     # get gap in lightcurve 2
     idx2 = findall(vcat(0, diff(lc2.time)) .>= max_gap)
-    gap2 = (lc2.time[idx1] .+ lc2.time[idx2.-1]) * 0.5
+    gap2 = (lc2.time[idx2] .+ lc2.time[idx2 .- 1]) * 0.5
     
     length(gap1) > length(gap2) ? gap = gap1 : gap = gap2
 
