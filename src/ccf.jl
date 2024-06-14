@@ -383,6 +383,8 @@ function find_gap(lc1::lightcurve, lc2::lightcurve, max_gap::T=60) where {T}
     return gap
 end
 
+
+
 # function do_with_gap(xint, x0, y0, maxgap)
     
 #     # some problems... need to debug

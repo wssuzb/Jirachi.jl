@@ -4,6 +4,28 @@ struct IntegerTicks end
 
 Makie.get_tickvalues(::IntegerTicks, vmin, vmax) = ceil(Int, vmin) : floor(Int, vmax)
 
+function check_lc_plot(lc1::lightcurve, lc2::lightcurve)
+    fig = with_theme(theme_web()) do
+        
+        f = Figure(; resolution = (1000, 300), fonts = (; regular= "sans"), fontsize = 25)
+
+        ax = Axis(f[1:2, 1:5], xlabel="MJD [day]", ylabel="Mag", xticksmirrored = true, yticksmirrored = true, xticklabelsize=20, yticklabelsize=20,yreversed = true,)
+        
+        scatter!(ax, lc1.time, lc1.flux, marker=:diamond, markersize=5, color=:white, strokecolor = :red, strokewidth=0.5)#, color=:red)
+        scatter!(ax, lc2.time, lc2.flux, markersize=5, color=:white, strokecolor = :blue, strokewidth=0.5)
+
+        vlines!(ax, gap, linestyle=:dash, color=:gray)
+
+        errorbars!(ax, lc1.time, lc1.flux, lc1.err, linewidth=0.2, color=:red
+        )
+        errorbars!(ax, lc2.time, lc2.flux, lc2.err, linewidth=0.2, color=:blue)
+        resize_to_layout!(f)
+        return f
+    end
+    
+end
+
+
 function plotlc(lc::lightcurve...; label=[], xlim=[], ms=2, lw=0.3, width=1000, hwratio=0.5, ft=20, lc_edges::AbstractArray=[], save_fig_path::String="./check_lc.pdf", save_fig::Bool=false)
 
     theme_llc = merge(
@@ -57,8 +79,6 @@ function plotlc(lc::lightcurve...; label=[], xlim=[], ms=2, lw=0.3, width=1000, 
     
     return fig
 end
-
-
 
 function plotsf(binsf1::binned_result, binsf2::binned_result; fitsf1=[], fitsf2=[], proper_time=[], save_fig_path::String="./fig/plot_sf.svg", save_fig::Bool=true)
     theme_sf = merge(theme_web(width=350, colors=MakiePublication.tableau_10(),linestyles=[nothing, :dash, :dash], ishollowmarkers=[true, true, false], markers=[:circle, :diamond, :rtriangle], linecycle=Cycle([:color, :linestyle], covary=true), scattercycle=Cycle([:color=>:markercolor, :strokecolor=>:color, :marker], covary=true), markerstrokewidth=0.8, heightwidthratio=0.9,), theme_latexfonts())
