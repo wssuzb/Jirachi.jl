@@ -21,9 +21,9 @@ function structure_function(time, flux)
     return sf(dt_all_sort, flux_sort)
 end
 
-function err_bootstraped(x)
+function err_bootstraped(x, num::Int64=500)
     res = []
-    num = 500
+    # num = 500
     for i in range(1, num, step=1)
         idx = collect(rand(1:length(x), length(x)))
         idx_unique = unique(idx)

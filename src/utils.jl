@@ -44,7 +44,7 @@ structure for loading light curve.
     band
 end
 lightcurve(time, flux, err) = lightcurve(time, flux, err, [])
-
+lightcurve(time, flux) = lightcurve(time, flux, fill!(similar(flux), zero(eltype(flux))), [])
 
 struct cv
     tau::Vector{Float64}

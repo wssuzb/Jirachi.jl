@@ -6,8 +6,6 @@ function corsig(r, v)
     return pvalue
 end
 
-
-
 function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64}, tunit::Float64, imode::Int64, itp_gap::Tuple{Symbol, Float64}=(:no, 60.0))
 
     tlagmin, tlagmax = trange
