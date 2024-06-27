@@ -4,17 +4,17 @@
 # @testset "Jirachi.jl" begin
     # Write your tests here.
 # end
-# include("../src/Jirachi.jl")
-# include("../src/utils.jl")
-# include("../src/structure_function.jl")
-# include("../src/color_variation.jl")
-# include("../src/fractional_variability.jl")
-# include("../src/run.jl")
+include("../src/Jirachi.jl")
+include("../src/utils.jl")
+include("../src/structure_function.jl")
+include("../src/color_variation.jl")
+include("../src/fractional_variability.jl")
+include("../src/run.jl")
 
-# using UncertainData, Random, Peaks, LaTeXStrings, DelimitedFiles, LsqFit, Interpolations, StatsBase, HDF5, Printf, LinearAlgebra, CairoMakie, MakiePublication
+using UncertainData, Random, Peaks, LaTeXStrings, DelimitedFiles, LsqFit, Interpolations, StatsBase, HDF5, Printf, LinearAlgebra, CairoMakie, MakiePublication
 
-# include("../src/fitting.jl")
-# include("../src/plotting.jl")
+include("../src/fitting.jl")
+include("../src/plotting.jl")
 
 # band = ["g", "r", "i", "z"]
 
@@ -26,30 +26,52 @@
 #     select_time(lc1, lc2, "./test/data/montano22_n1_" * b * "_binned.txt")
 # end
 
-# # lc1 = load_data("/Users/suzhenbo/Mylibrary/Projects/lib_julia_external/VariabilityTools/test_data/lc/montano22_n1_i_binned.txt", [1, 3, 4]; band = "i")
-# # lc2 = load_data("/Users/suzhenbo/Mylibrary/Projects/lib_julia_external/VariabilityTools/test_data/lc/montano22_n1_z_binned.txt", [1, 3, 4]; band = "z")
+lc1 = load_data("/Users/suzhenbo/Mylibrary/Projects/lib_julia_external/VariabilityTools/test_data/lc/montano22_n1_g_binned.txt", [1, 3, 4]; band = "i")
+lc2 = load_data("/Users/suzhenbo/Mylibrary/Projects/lib_julia_external/VariabilityTools/test_data/lc/montano22_n1_z_binned.txt", [1, 3, 4]; band = "z")
 
-
-
+tunits = 3600 * 24
+lc1.time = lc1.time .- lc1.time[1]
+lc1.time = round.(lc1.time * tunits, digits=2)
+lc2.time = lc2.time .- lc2.time[1]
+lc2.time = round.(lc2.time * tunits, digits=2)
+lc1 = lc2
 # lc1 = load_data("./test/data/montano22_n1_g_binned.txt", [1, 3, 4]; band = "i")
-# # lc1.time =  lc1.time* 3600 * 24
+# lc1.time =  lc1.time* 
 
 # lc2 = load_data("./test/data/montano22_n1_r_binned.txt", [1, 3, 4]; band = "z")
-# # lc2.time =  lc2.time * 3600 * 24
+# lc2.time =  lc2.time * 3600 * 24
 
 # # lc1 == lc1_
 
 
-# sf_bin_edges=0:0.1:5
-# cv_bin_edges=0:0.2:5
-# nsigma=3
-# erron=true
-# nsim=100
-# mode = "both"
-# fi_np::String="./test/run_all.h5"
-# lower_bounds = [0, 0, 0, 0.001]
-# upper_bounds = [10, 2e4, 2, 0.1]
-# p0 = [1, 1e3, 1, 0.05]
+sf_bin_edges=0:0.1:10
+cv_bin_edges=0:0.2:5
+nsigma=3
+erron=true
+nsim=100
+mode = "both"
+fi_np::String="./test/run_all.h5"
+lower_bounds = [0, 0, 0, 0.001]
+upper_bounds = [10, 2e4, 2, 0.1]
+p0 = [1, 1e3, 1, 0.05]
+
+
+res = structure_function(lc1.time, lc1.flux, :flux)
+
+new_res = sf(res.tau, sqrt.(pi/2 * res.sf .^ 2))
+
+res_nan = sf(res.tau[all.(isfinite, res.sf)], res.sf[all.(isfinite, res.sf)])
+
+new_res_nan = sf(new_res.tau[all.(isfinite, new_res.sf)], new_res.sf[all.(isfinite, new_res.sf)])
+
+res_bin = binned_structure_function(res_nan, sf_bin_edges, mean)
+new_res_bin = binned_structure_function(new_res_nan, sf_bin_edges, iqr)
+
+res_bin.y
+
+plotsf(res_bin, new_res_bin; save_fig=false)
+
+println(" ")
 
 
 # t_cad = 103.68 #mean(diff(lc.time))

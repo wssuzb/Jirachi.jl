@@ -308,7 +308,7 @@ function interpolate_with_max_gap(orig_x, orig_y, target_x, max_gap=9999, orig_x
     end
 
     target_y = zeros(length(target_x))
-    idx_orig = 0
+    idx_orig = 1 # julia index start from 1, while python from 0.
     orig_gone_through = false
 
     for (idx_target, x_new) in enumerate(target_x)
