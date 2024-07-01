@@ -42,7 +42,7 @@ function binned_structure_function(data::sf, bin_edges::AbstractArray=1:0.1:5, m
     
     # typeof(method) !<: Function && 
     
-    method ∉ [mean, iqr] && throw(DomainError(method, "SF method must be :mean or :iqr!!!"))
+    method ∉ [mean, iqr, std] && throw(DomainError(method, "SF method must be mean OR iqr OR std!!!"))
     
     tau = log10.(data.tau)
     sf = abs.(data.sf)
@@ -62,7 +62,8 @@ function binned_structure_function(data::sf, bin_edges::AbstractArray=1:0.1:5, m
     bin_center = round.(_bin_edges[2:end] .- bin_width, digits=2)
     
     method == mean ? res = binned_result(bin_center, bin_width, sqrt.(pi/2 * bin_value .^ 2), bin_yerr) :
-    method == iqr ? res = binned_result(bin_center, bin_width, 0.741 * bin_value, bin_yerr) : throw(DomainError(method, "SF method must be :mean or :iqr!!!"))
+    method == iqr ? res = binned_result(bin_center, bin_width, 0.741 * bin_value, bin_yerr) :
+    method == std ? res = binned_result(bin_center, bin_width, bin_value, bin_yerr) : throw(DomainError(method, "SF method must be :mean or :iqr!!!"))
 
     return res
 end

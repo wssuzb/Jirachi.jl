@@ -38,7 +38,7 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
                 idx = all.(isfinite, y2new) # find values without nan
                 y2new = y2new[idx]
 
-                new_itp = linear_interpolation(t2new, y1, extrapolation_bc = Line())
+                new_itp = Interpolations.linear_interpolation(t2new, y1, extrapolation_bc = Line())
                 y1new = new_itp.(t2new[selin][idx])
 
                 y1sum = sum(y1new)
@@ -51,7 +51,7 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
                 knot = length(y1new)
 
             else
-                itp = linear_interpolation(t2, y2, extrapolation_bc=Line())
+                itp = Interpolations.linear_interpolation(t2, y2, extrapolation_bc=Line())
                 y2new = itp.(t2new[selin])
                 y1new = y1[selin]
 
@@ -93,7 +93,7 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
                 y1new = interpolate_with_max_gap(t1, y1, t1new[selin], itp_gap[2])        
                 idx = all.(isfinite, y1new) # find values without nan
                 y1new = y1new[idx]
-                new_itp = linear_interpolation(t1new, y2, extrapolation_bc = Line())
+                new_itp = Interpolations.linear_interpolation(t1new, y2, extrapolation_bc = Line())
                 y2new = new_itp.(t1new[selin][idx])
                 y1sum = sum(y1new)
                 y1sqsum = sum(y1new .* y1new)
@@ -102,7 +102,7 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
                 y1y2sum = sum(y1new .* y2new)
                 knot = length(y1new)
             else
-                itp = linear_interpolation(t1, y1,extrapolation_bc=Line())
+                itp = Interpolations.linear_interpolation(t1, y1,extrapolation_bc=Line())
                 y1new = itp.(t1new[selin])
                 y2new = y2[selin]
                 y2sum = sum(y2new)
@@ -151,7 +151,7 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
         taulist = taulist12
         npts = npts12
     end
-    return (ccf=Float64.(ccf), taulist=Float64.(taulist), npts=Int64.(npts))
+    return (ccf=Float64.(ccf), taulist=Float64.(taulist), npts=Float64.(npts))
 end
 
 function peakcent(
@@ -222,7 +222,13 @@ function peakcent(
             
             if sum(rdif_pos) > 0
                 tlag_centroid = sum(ccf_pack.ccf[rdif_pos] .* ccf_pack.taulist[rdif_pos]) / sum(ccf_pack.ccf[rdif_pos])
-                status_centroid = 1
+                if isa(tlag_centroid, Number) #&& (typeof(tlag_centroid) != Int)
+                    status_centroid = 1
+                    tlag_centroid = tlag_centroid
+                else
+                    status_centroid = 0
+                    tlag_centroid = -9999.0
+                end
             end
         end
     end
@@ -244,18 +250,18 @@ function xcor_mc(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float6
     
     (numt1 < 2) | (numt2 < 2) && throw(DomainError("Length of lc1 is $numt1, of lc2 is $numt2, should be larger than 2!!!"))
 
-    tlags_peak = []
-    tlags_centroid = []
-    pvals = []
+    tlags_peak = zeros(nsim)
+    tlags_centroid = zeros(nsim)
+    pvals = zeros(nsim)
     nsuccess_peak = 0
     nsuccess_rvals = 0
     nfail_peak = 0
     nsuccess_centroid = 0
     nfail_centroid = 0
     nfail_rvals = 0
-    max_rvals = []
+    max_rvals = zeros(nsim)
 
-    Threads.@threads for i=1: nsim
+    for i=1: nsim
 
         lc1_new = lc_bootstrapped(lc1; seed = i, mode = mcmode)
         lc2_new = lc_bootstrapped(lc2; seed = i, mode = mcmode)
@@ -264,30 +270,28 @@ function xcor_mc(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float6
 
         pc_pack = peakcent(lc1_new, lc2_new, trange, tunit, thres, siglevel, imode, sigmode, itp_gap)
 
-        if pc_pack.status_peak == 1
-            push!(tlags_peak, pc_pack.tlag_peak)
-            push!(pvals, pc_pack.peak_pvalue)
+        if (pc_pack.status_peak == 1)
+            tlags_peak[i] = pc_pack.tlag_peak
+            pvals[i]  = pc_pack.peak_pvalue
             nsuccess_peak += 1
         elseif pc_pack.status_peak == 0
             nfail_peak += 1
         end
 
-        if pc_pack.status_centroid == 1
-            push!(tlags_centroid, pc_pack.tlag_centroid)
+        if (pc_pack.status_centroid == 1)
+            tlags_centroid[i] = pc_pack.tlag_centroid
             nsuccess_centroid += 1
         else
             nfail_centroid += 1
         end
 
         if pc_pack.status_rval == 1
-            push!(max_rvals, pc_pack.max_rval)
+            max_rvals[i] = pc_pack.max_rval
             nsuccess_rvals += 1
         else
             nfail_rvals += 1
         end
     end
-
-
 
     return (tlags_peak=tlags_peak, tlags_centroid=tlags_centroid, nsuccess_peak=nsuccess_peak, nfail_peak=nfail_peak, nsuccess_centroid=nsuccess_centroid, nfail_centroid=nfail_centroid, max_rvals=max_rvals, nfail_rvals=nfail_rvals, pvals=pvals)
 end

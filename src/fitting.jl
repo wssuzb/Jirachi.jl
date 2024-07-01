@@ -17,7 +17,7 @@ function find_t_min(data::binned_result, p::Vector{Float64}; sf_noise_sigma=2, t
 
     noise_cut = (sf_noise_sigma * sqrt(2) * p[4])
     
-    itp = linear_interpolation(sf_new[idx_tmax], t_new[idx_tmax], extrapolation_bc=Line())
+    itp = Interpolations.linear_interpolation(sf_new[idx_tmax], t_new[idx_tmax], extrapolation_bc=Line())
 
     t_used_min = itp(noise_cut)
     
