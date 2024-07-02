@@ -121,12 +121,12 @@ def structure_function(lc, used_bins):
 
     int0 = np.argsort(dt_all, kind='mergesort')
     dt_all_sort = dt_all[int0]
-    flux_sort = np.sqrt(np.pi / 2 * dx_flux_all[int0] ** 2)
+    flux_sort = dx_flux_all[int0]
     
     bin_dt_width = np.array([(used_bins[i+1] - used_bins[i]) / 2 for i in range(len(used_bins) - 1)])
     bin_dt_center = used_bins[1:] - bin_dt_width
 
-    bin_sf = binned_statistic(dt_all_sort, flux_sort, statistic=lambda x: np.nanmean(x), bins=used_bins)[0]
+    bin_sf = binned_statistic(dt_all_sort, flux_sort, statistic=lambda x: np.sqrt(np.pi / 2 * np.nanmean(x) ** 2), bins=used_bins)[0]
 
     bin_sf_err = binned_statistic(dt_all_sort, flux_sort, statistic=lambda x : np.nanstd(x) / np.sqrt(np.count_nonzero(~np.isnan(x))), bins=used_bins)[0]
 
