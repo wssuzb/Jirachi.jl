@@ -11,6 +11,7 @@ Base.@kwdef mutable struct disk_parameter
     numrings::Float64 = 38
     inner_radius::Float64 = 6.0
     radius_ratio::Float64 = 1.2
+    albedo::Float64 = 0.5
 end
 
 mutable struct disk_parameter_update
@@ -32,6 +33,7 @@ mutable struct disk_parameter_update
     con_kb::Float64
     con_c::Float64
     disk_ia::Float64
+    albedo::Float64 = 0.5
 end
 
 
@@ -88,7 +90,7 @@ function disk_systerm(d::disk_parameter)
     con_c = Float64(uconvert(u"cm/s", (1u"c" |> upreferred)).val) #29979245800
     disk_ia = d.disk_ia * pi /180.
 
-    disk_update = disk_parameter_update(rin, fracring, numring, rratio, hcor, bhmass, disk_z, lumin, rgravcm, hcorcm, disk_eta, disk_ld, disk_mdot, con_hp, con_kb, con_c, disk_ia)
+    disk_update = disk_parameter_update(rin, fracring, numring, rratio, hcor, bhmass, disk_z, lumin, rgravcm, hcorcm, disk_eta, disk_ld, disk_mdot, con_hp, con_kb, con_c, disk_ia, d.albedo)
     return disk_update
 end
 

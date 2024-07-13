@@ -142,7 +142,7 @@ function reprocessing(td::Any, items::Any, d::disk_parameter_update) # td: thin_
     end
 
     temp = transpose(reshape(td.temperature_zones_original, (24,38)))
-    albedo = 0.5
+    albedo = d.albedo
     fenmu = rcorcm .^ 3 .* 4 .* pi .* 5.670373E-05
     temp4 = temp .^ 4 .+ (1-albedo) .* lcor_ .* d.hcorcm ./ fenmu
     temperature_zones_illuminate = temp4 .^ 0.25
