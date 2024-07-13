@@ -105,7 +105,7 @@ function Base.show(trans_info::trans_curve_info)
 end
 
 
-function trans_curve(filepath::String, band::Vector{String}, weff::Vector{Float64}; plot_trans_curve::Bool=true)
+function trans_curve(filepath::String, band::Vector{String}, weff::Vector{Float64})#; plot_trans_curve::Bool=true)
 
     println("The transmission file located in: ", filepath)
     println("Transmission curve file name: ", readdir(filepath))
@@ -116,31 +116,31 @@ function trans_curve(filepath::String, band::Vector{String}, weff::Vector{Float6
 
     show(trans_info)
 
-    if plot_trans_curve
-        p = plot(
-            legend = true, 
-            framestyle = :box,
-            # aspect_ratio = 1, 
-            size = (400, 200),
-            format = :svg
-        )        
-        for i in 1:length(trans_info.band)
-            t = readdlm(filepath * "/total_" * band[i] * ".txt")
-            plot!(p, t[:, 1], t[:, 2], label=trans_info.band[i])
-        end
-        display(p)
-        trans = Dict()
-        for i in 1:length(trans_info.band)
-            t = readdlm(filepath * "/total_" * band[i] * ".txt")
-            trans[trans_info.band[i]] = (wavelength=t[:, 1], strength=t[:, 2])
-        end
-    else
-        trans = Dict()
-        for i in 1:length(trans_info.band)
-            t = readdlm(filepath * "/total_" * band[i] * ".txt")
-            trans[trans_info.band[i]] = (wavelength=t[:, 1], strength=t[:, 2])
-        end
+    # if plot_trans_curve
+    #     p = plot(
+    #         legend = true, 
+    #         framestyle = :box,
+    #         # aspect_ratio = 1, 
+    #         size = (400, 200),
+    #         format = :svg
+    #     )        
+    #     for i in 1:length(trans_info.band)
+    #         t = readdlm(filepath * "/total_" * band[i] * ".txt")
+    #         plot!(p, t[:, 1], t[:, 2], label=trans_info.band[i])
+    #     end
+    #     display(p)
+    #     trans = Dict()
+    #     for i in 1:length(trans_info.band)
+    #         t = readdlm(filepath * "/total_" * band[i] * ".txt")
+    #         trans[trans_info.band[i]] = (wavelength=t[:, 1], strength=t[:, 2])
+    #     end
+    # else
+    trans = Dict()
+    for i in 1:length(trans_info.band)
+        t = readdlm(filepath * "/total_" * band[i] * ".txt")
+        trans[trans_info.band[i]] = (wavelength=t[:, 1], strength=t[:, 2])
     end
+    # end
     return (trans=trans, band=band, weff=weff)
 end
 
