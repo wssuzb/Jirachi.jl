@@ -1,5 +1,6 @@
 export corsig, xcor, peakcent, xcor_mc, interpolate_with_max_gap
 
+
 function corsig(r, v)
     tst = r * sqrt(v / (1 - r ^ 2))
     pvalue = 1 - cdf( TDist(v), tst)
@@ -33,8 +34,8 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
         knot = sum(selin)
         if knot >0
             if (itp_gap[1] == :no)
-                y2new = interpolate_with_max_gap(t2, y2, t2new[selin], itp_gap[2])
-                
+                # y2new = interpolate_with_max_gap(t2, y2, t2new[selin], itp_gap[2])
+                y2new = do_with_gap(t2, y2, t2new[selin], itp_gap[2])
                 idx = all.(isfinite, y2new) # find values without nan
                 y2new = y2new[idx]
 
@@ -90,7 +91,8 @@ function xcor(lc1::lightcurve, lc2::lightcurve, trange::Tuple{Float64, Float64},
 
         if knot > 0
             if (itp_gap[1] == :no)
-                y1new = interpolate_with_max_gap(t1, y1, t1new[selin], itp_gap[2])        
+                # y1new = interpolate_with_max_gap(t1, y1, t1new[selin], itp_gap[2])
+                y1new = do_with_gap(t1, y1, t1new[selin], itp_gap[2])
                 idx = all.(isfinite, y1new) # find values without nan
                 y1new = y1new[idx]
                 new_itp = Interpolations.linear_interpolation(t1new, y2, extrapolation_bc = Line())
@@ -168,8 +170,10 @@ function peakcent(
     
     max_indx = argmax(ccf_pack.ccf)
     max_rval = ccf_pack.ccf[max_indx]
+    
+    safe_sqrt = -0.0001
 
-    ccf_pack.npts[max_indx] > 2.0 ? peak_pvalue = corsig(ccf_pack.ccf[max_indx], ccf_pack.npts[max_indx] - 2.0) : peak_pvalue = 1.0
+    ccf_pack.npts[max_indx] > 2.0 ? peak_pvalue = corsig(ccf_pack.ccf[max_indx] + safe_sqrt, ccf_pack.npts[max_indx] - 2.0) : peak_pvalue = 1.0
 
     if sigmode > 0
         if (max_rval >= sigmode) && (ccf_pack.taulist[max_indx] > tlagmin) && (ccf_pack.taulist[max_indx] < tlagmax)
@@ -387,25 +391,25 @@ end
 
 
 
-# function do_with_gap(xint, x0, y0, maxgap)
+function do_with_gap(x0, y0, xint, maxgap)
     
-#     # some problems... need to debug
+    # some problems... need to debug
 
-#     itp = LinearInterpolation(x0, y0, extrapolation_bc=Line())
-#     yint = itp.(xint)
+    itp = LinearInterpolation(x0, y0, extrapolation_bc=Line())#Interpolations.linear_interpolation
+    yint = itp.(xint)
 
-#     x_index = searchsortedfirst.(Ref(x0), xint)
-#     x_index = clamp!(x_index, 0, length(x0) - 1)
+    x_index = searchsortedfirst.(Ref(x0), xint)
+    x_index = clamp!(x_index, 0, length(x0) - 1)
 
-#     dx = vcat(0, diff(x0))
+    dx = vcat(0, diff(x0))
 
-#     index = @. (dx[x_index] > maxgap)
+    index = @. (dx[x_index] > maxgap)
 
-#     x_index = searchsortedfirst.(Ref(x0), xint)
-#     x_index = clamp!(x_index, 0, length(x0) - 1)
-#     dx = vcat(0, diff(x0))
-#     index = @. (index) & (dx[x_index] > maxgap)
+    x_index = searchsortedfirst.(Ref(x0), xint)
+    x_index = clamp!(x_index, 0, length(x0) - 1)
+    dx = vcat(0, diff(x0))
+    index = @. (index) & (dx[x_index] > maxgap)
 
-#     yint[index] .= NaN
-#     return yint
-# end
+    yint[index] .= NaN
+    return yint
+end

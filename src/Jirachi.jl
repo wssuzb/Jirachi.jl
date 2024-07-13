@@ -31,6 +31,7 @@ include("run.jl")
 include("plotting.jl")
 include("generateDRW.jl")
 include("ccf.jl")
+include("variability_techniques.jl")
 
 export lightcurve, cv, sf, binned_result, percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time, get_common_lc, bin_light_curve, bin_lc_edges, remove_lc_outlier, remove_lc_nan, hcatlc, mergelc
 

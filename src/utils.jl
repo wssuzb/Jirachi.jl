@@ -1,4 +1,4 @@
-export lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time, bin_light_curve, get_common_lc, bin_lc_edges, remove_lc_outlier, remove_lc_nan, hcatlc, mergelc
+export lightcurve, cv, sf, binned_result,percentile_16_50_84, load_data, save_data, lc_bootstrapped, find_nearest, select_time, bin_light_curve, get_common_lc, bin_lc_edges, remove_lc_outlier, remove_lc_nan, hcatlc, mergelc, inRange
 
 
 @kwdef mutable struct parameters
@@ -45,6 +45,19 @@ structure for loading light curve.
 end
 lightcurve(time, flux, err) = lightcurve(time, flux, err, [])
 lightcurve(time, flux) = lightcurve(time, flux, fill!(similar(flux), zero(eltype(flux))), [])
+
+struct inRange
+    min
+    max
+end
+(func::inRange)(x) = func.min ≤ x ≤ func.max
+
+function lightcurve(lc::lightcurve, gap1=0, gap2=Inf)
+    gap2 < gap1 && throw(DomainError("$(gap2) should be larger than $(gap1)!!!"))
+    idx = inRange(gap1, gap2).(lc.time)
+    return lightcurve(lc.time[idx], lc.flux[idx], lc.err[idx], lc.band)
+end
+
 
 struct cv
     tau::Vector{Float64}
